@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
+  "buildCommand": "cd clearsar-app && npm run build",
+  "outputDirectory": "clearsar-app/dist",
   "rewrites": [
     {
       "source": "/(.*)",
