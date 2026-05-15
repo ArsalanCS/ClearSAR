@@ -1,22 +1,42 @@
-# CODING AGENTS: READ THIS FIRST
+# ClearSAR Frontend
 
-This is a **handoff bundle** from Claude Design (claude.ai/design).
+ClearSAR is a React + TypeScript frontend for browsing the SAR-to-optical workflow and evaluation views.
 
-A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
+## Tech Stack
 
-## What you should do — IMPORTANT
+- React 18
+- TypeScript
+- Vite
 
-**Read `clearsar/project/ClearSAR App.html` in full.** The user had this file open when they triggered the handoff, so it's almost certainly the primary design they want built. Read it top to bottom — don't skim. Then **follow its imports**: open every file it pulls in (shared components, CSS, scripts) so you understand how the pieces fit together before you start implementing.
+## Frontend App
 
-**If anything is ambiguous, ask the user to confirm before you start implementing.** It's much cheaper to clarify scope up front than to build the wrong thing.
+The application lives in `clearsar-app/` and includes the following main views:
 
-## About the design files
+- Landing
+- Upload
+- Processing
+- Results
+- Library (dashboard)
+- Evaluation (admin)
 
-The design medium is **HTML/CSS/JS** — these are prototypes, not production code. Your job is to **recreate them pixel-perfectly** in whatever technology makes sense for the target codebase (React, Vue, native, whatever fits). Match the visual output; don't copy the prototype's internal structure unless it happens to fit.
+Navigation is component-driven from `src/App.tsx` and supports keyboard shortcuts for quick page switching.
 
-**Don't render these files in a browser or take screenshots unless the user asks you to.** Everything you need — dimensions, colors, layout rules — is spelled out in the source. Read the HTML and CSS directly; a screenshot won't tell you anything they don't.
+## Run Locally
 
-## Bundle contents
+```bash
+cd clearsar-app
+npm install
+npm run dev
+```
 
-- `clearsar/README.md` — this file
-- `clearsar/project/` — the `ClearSAR` project files (HTML prototypes, assets, components)
+## Build
+
+```bash
+cd clearsar-app
+npm run build
+npm run preview
+```
+
+## Repository Notes
+
+- The old prototype bundle folder `project/` has been removed from this repository.
