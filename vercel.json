@@ -1,6 +1,5 @@
 {
-  "installCommand": "cd clearsar-app && npm install",
-  "buildCommand": "cd clearsar-app && npm run build",
+  "buildCommand": "bash build.sh",
   "outputDirectory": "clearsar-app/dist",
   "rewrites": [
     {
