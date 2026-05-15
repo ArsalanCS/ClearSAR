@@ -1,0 +1,1956 @@
+
+
+
+
+
+
+
+Final Year Project
+
+
+
+
+
+
+
+
+
+
+
+Defense Proposal
+
+
+
+
+
+
+
+
+
+
+
+FYP Team
+
+
+
+
+
+Arsalan Hassan 22F-3050
+
+
+
+
+
+
+
+Khizra
+
+ Shehzadi 22F-3592
+
+
+
+
+
+Muhammad Hashir 22F-3294
+
+
+
+
+
+
+
+
+
+
+
+Supervised by
+
+
+
+
+
+Dr Usman Ghous
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Department of Computer Science
+
+
+
+
+
+National University of Computer and Emerging Science
+
+
+
+
+
+Chiniot, Pakistan
+
+
+
+
+
+2026
+
+
+
+
+
+
+
+
+Anti-Plagiarism Declaration
+
+
+
+
+
+
+
+This is to declare that the above publication produced under the: 
+
+
+
+Title: ________________________________ 
+
+
+
+is the sole contribution of the author(s) and no part hereof has been reproduced on as it is basis (cut and paste) which can be considered as Plagiarism. All referenced parts have been used to argue the idea and have been cited properly. I/We will be responsible and liable for any consequence if violation of this declaration is determined. 
+
+
+
+Date: ______________ 
+
+
+
+Student 1
+
+
+
+Name: _____________________ 
+
+
+
+
+
+
+
+
+
+Signature:_
+
+__________________ 
+
+
+
+Student 2
+
+
+
+Name: _____________________
+
+
+
+ 
+
+
+
+
+
+Signature:_
+
+__________________ 
+
+
+
+Student 3
+
+
+
+Name: _____________________
+
+
+
+ 
+
+
+
+
+
+Signature:_
+
+__________________ 
+
+
+
+
+
+
+
+
+
+
+
+
+Abstract
+
+
+
+Synthetic Aperture Radar (SAR) imagery provides critical all-weather Earth observation capabilities but remains challenging for non-expert interpretation due to speckle noise and unfamiliar visual patterns. This project develops a web-based software system that leverages state-of-the-art artificial intelligence to make SAR data accessible to broader user communities.
+
+The system employs fine-tuned Latent Diffusion Models (specifically Stable Diffusion) to translate SAR images into visually intuitive optical-style representations. These translated images are then processed through BLIP-2, a vision-language model, to generate automated natural language scene descriptions. The complete solution is deployed as a production-grade web application with a React frontend and 
+
+FastAPI
+
+ backend.
+
+Using the SEN12MS paired SAR-optical dataset (180,000+ image pairs from Sentinel-1 and Sentinel-2 satellites), we fine-tune the diffusion model and conduct comprehensive evaluation against baseline GAN methods (Pix2Pix). The system achieves high-quality optical image generation with automated scene understanding, enabling applications in disaster response, environmental monitoring, urban planning, and defense.
+
+Key deliverables include: (1) fine-tuned SAR-to-optical translation model, (2) integrated scene description pipeline, (3) user-friendly web application, (4) comprehensive evaluation framework, and (5) complete documentation for deployment and future development. This development-focused project demonstrates practical application of cutting-edge generative AI to real-world remote sensing challenges.
+
+
+
+
+
+
+
+
+
+
+Table of Contents
+
+
+
+
+
+		 TOC \o "1-3" \h \z \u 1.	Vision Document	 PAGEREF _Toc220711485 \h 1
+
+
+
+
+
+		1.1.	Introduction	 PAGEREF _Toc220711486 \h 1
+
+
+
+
+
+1.1.1.	Problem Statement:	 PAGEREF _Toc220711487 \h 1
+
+
+
+
+
+1.1.2.	Objectives	 PAGEREF _Toc220711488 \h 1
+
+
+
+
+
+		1.2.	Motivation	 PAGEREF _Toc220711489 \h 2
+
+
+
+
+
+		1.3.	Overview	 PAGEREF _Toc220711490 \h 2
+
+
+
+
+
+		1.4.	Functionality	 PAGEREF _Toc220711491 \h 3
+
+
+
+
+
+		1.4.1.	SAR Image Upload and Input Management	 PAGEREF _Toc220711492 \h 3
+
+
+
+
+
+		1.4.2.	Image Preprocessing Module	 PAGEREF _Toc220711493 \h 3
+
+
+
+
+
+		1.4.3.	Diffusion-Based SAR to Optical Image Translation	 PAGEREF _Toc220711494 \h 4
+
+
+
+
+
+		1.4.4.	Generated Optical Image Visualization	 PAGEREF _Toc220711495 \h 4
+
+
+
+
+
+		1.4.5.	Automated Scene Description Generation	 PAGEREF _Toc220711496 \h 4
+
+
+
+
+
+		1.4.6.	Backend Processing and Data Flow Management	 PAGEREF _Toc220711497 \h 5
+
+
+
+
+
+		1.4.7.	User-Friendly Web Interface	 PAGEREF _Toc220711498 \h 5
+
+
+
+
+
+		1.4.8.	Performance Evaluation and Monitoring	 PAGEREF _Toc220711499 \h 6
+
+
+
+
+
+		2.	Tools and Technologies	 PAGEREF _Toc220711500 \h 6
+
+
+
+
+
+	Programming Languages	 PAGEREF _Toc220711501 \h 7
+
+
+
+
+
+	AI Frameworks and Libraries	 PAGEREF _Toc220711502 \h 7
+
+
+
+
+
+	Web Technologies	 PAGEREF _Toc220711503 \h 7
+
+
+
+
+
+	Development and Deployment Tools	 PAGEREF _Toc220711504 \h 8
+
+
+
+
+
+		3.	Required hardware and Software resources	 PAGEREF _Toc220711505 \h 8
+
+
+
+
+
+		3.1.	Hardware	 PAGEREF _Toc220711506 \h 8
+
+
+
+
+
+		3.2.	Software	 PAGEREF _Toc220711507 \h 9
+
+
+
+
+
+		4.	High Level Diagram	 PAGEREF _Toc220711508 \h 9
+
+
+
+
+
+		5.	Timeline	 PAGEREF _Toc220711509 \h 10
+
+
+
+
+
+		6.	Datasets and Pre-trained Models	 PAGEREF _Toc220711510 \h 11
+
+
+
+
+
+	6.1 Primary Dataset	 PAGEREF _Toc220711511 \h 11
+
+
+
+
+
+	6.2 Alternative/Supplementary Datasets	 PAGEREF _Toc220711512 \h 11
+
+
+
+
+
+	6.3 Pre-trained Models	 PAGEREF _Toc220711513 \h 11
+
+
+
+
+
+		7.	Literature Review	 PAGEREF _Toc220711514 \h 12
+
+
+
+
+
+		8.	References	 PAGEREF _Toc220711515 \h 14
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Vision Document
+
+
+
+
+
+Introduction
+
+
+
+Remote sensing technologies, particularly Synthetic Aperture Radar (SAR), provide unprecedented Earth observation capabilities independent of weather conditions, cloud cover, or daylight. SAR systems actively emit microwave signals and measure backscattered energy, enabling continuous surveillance for critical applications including disaster management, military reconnaissance, environmental monitoring, and urban planning.
+
+Despite these powerful capabilities, SAR imagery presents significant interpretability challenges. The radar backscatter patterns produce images with speckle noise, geometric distortions, and visual characteristics fundamentally different from familiar optical photographs. Traditional SAR interpretation requires specialized training and expertise, limiting its accessibility to a small community of remote sensing professionals.
+
+Recent breakthroughs in artificial intelligence, particularly Latent Diffusion Models (LDM) and vision-language models, offer new possibilities for addressing SAR interpretability. This project adopts a development-focused approach to engineer a practical working system by leveraging state-of-the-art pre-trained models, fine-tuning them on domain-specific SAR-optical datasets, and integrating multiple AI components into a cohesive web-based platform.
+
+
+
+
+
+Problem Statement:
+
+
+
+
+
+Although Synthetic Aperture Radar (SAR) enables all-weather imaging, its complex backscatter patterns, speckle noise, and geometric distortions make interpretation difficult and time-consuming, requiring specialized expertise. Existing image processing and GAN-based methods fail to produce stable, realistic, and interpretable results. Therefore, there is a need for an accessible, near-real-time system that converts SAR imagery into visually intuitive optical images with automated natural-language descriptions via a user-friendly web interface.
+
+
+
+
+
+Objectives
+
+
+
+
+
+Develop a fine-tuned SAR-to-optical translation model using Latent Diffusion Models on the SEN12MS dataset
+
+
+
+
+
+Implement an automated scene description pipeline using BLIP-2 vision-language model
+
+
+
+
+
+Build a production-grade web application with React frontend and 
+
+FastAPI
+
+ backend
+
+
+
+
+
+Establish comprehensive evaluation framework comparing against Pix2Pix GAN baseline
+
+
+
+
+
+Deliver complete documentation including system architecture, deployment guide, and user manual
+
+
+
+
+
+Achieve visual quality metrics: PSNR > 20 dB and SSIM > 0.6 on test set
+
+
+
+
+
+Ensure end-to-end processing time under 40 seconds per 256×256 image
+
+
+
+
+
+Motivation
+
+
+
+This project addresses real-world challenges with tangible impact:
+Democratizing SAR Technology: By providing automatic optical translation and scene descriptions, we make valuable SAR data accessible to emergency response teams, urban planners, environmental scientists, and agricultural workers without remote sensing expertise.
+Time-Critical Applications: In disaster scenarios (floods, earthquakes, landslides), rapid situation assessment saves lives. Our system enables quick damage extent mapping, identification of affected infrastructure, and faster resource allocation without waiting for expert analysis.
+Technical Learning: This project provides hands-on experience with cutting-edge AI techniques (Diffusion Models, Vision-Language Models) while developing complete system engineering skills including data pipeline construction, model optimization, web development, and deployment.
+Career Development: The project develops industry-relevant skills for AI/ML Engineer, Full-Stack Developer, Computer Vision Specialist, and Geospatial Technology positions. A deployed web application provides concrete evidence of problem-solving ability and technical breadth.
+
+
+
+
+
+Overview
+
+
+
+The system consists of two primary AI modules integrated into a web-based platform:
+ 1. Latent Diffusion Model (LDM) Translation Module: Fine-tuned Stable Diffusion v1.5/v2.1 converts SAR images into optical-style images with improved clarity and realism.
+ 2. Automated Scene Description Module: BLIP-2 vision-language model analyzes translated images to generate meaningful natural language summaries.
+The entire workflow is integrated into a web platform built with React (frontend) and 
+
+FastAPI
+
+ (backend) that allows users to upload SAR images and receive visual and textual outputs with downloadable results.
+
+
+
+
+
+Functionality 
+
+
+
+
+
+ SAR Image Upload and Input Management
+
+
+
+
+
+The system allows users to upload SAR images through a web-based interface. The uploaded images are validated for correct format (
+
+GeoTIFF
+
+) and resolution before processing.
+This module ensures:
+• Secure image upload with drag-and-drop support
+• Supported SAR image formats (
+
+GeoTIFF
+
+ .
+
+tif
+
+/.tiff)
+• File size validation (maximum 50 MB)
+• Automatic unique request ID generation
+• Upload progress indication.
+
+
+
+
+
+ Image Preprocessing Module
+
+
+
+Before passing SAR images into the diffusion model, preprocessing operations are applied to improve data consistency and model performance.
+This includes:
+•  Conversion to dB scale (10 * log10)
+•  Normalization to [0,1] range
+•  Resizing to 256×256 pixels using bicubic interpolation
+•  Dual-polarization handling (VV + VH combination)
+•  Tensor conversion for model input
+This step reduces speckle effects and standardizes inputs for accurate translation.
+
+
+
+
+
+ Diffusion-Based SAR to Optical Image Translation
+
+
+
+
+
+This is the core component of the system. A fine-tuned Latent Diffusion Model (Stable Diffusion) processes the preprocessed SAR images to generate realistic optical-style images.
+Key features include:
+• High-quality image synthesis through iterative denoising (50 steps)
+• Preservation of spatial structures and semantic content
+• Reduction of noise artifacts
+• Processing time: ~20-25 seconds per image with GPU
+• Output: 256×256 pixel RGB images in PNG format
+The model would be fine-tuned on 150,000+ paired SAR-optical examples from the SEN12MS dataset.
+
+
+
+
+
+ Generated Optical Image Visualization
+
+
+
+
+
+The translated optical image is displayed on the user interface alongside the original SAR image in a side-by-side comparison layout.
+This allows users to:
+• Compare SAR and optical outputs visually
+• Analyze visual improvements and translation quality
+• Zoom in for detailed inspection (100%-400%)
+• View image metadata (dimensions, file size, timestamp).
+
+
+
+
+
+Automated Scene Description Generation
+
+
+
+
+
+Using BLIP-2 vision-language model, the translated optical image is analyzed to generate natural language descriptions.
+The module:
+• Processes optical images through vision encoder
+• Aligns visual and language features through Q-Former
+• Generates coherent 10-50 word descriptions
+• Identifies key scene elements: buildings, roads, water bodies, vegetation, urban areas
+• Processing time: ~5 seconds per image
+Example outputs:
+- "The image shows a dense urban area with multiple buildings and intersecting road networks."
+- "A large water body is visible adjacent to agricultural land with scattered vegetation."
+- "The scene depicts mountainous terrain with mixed forest coverage and minimal urban development."
+This enhances interpretability for non-expert users.
+
+
+
+
+
+ Backend Processing and Data Flow Management
+
+
+
+
+
+The 
+
+FastAPI
+
+ backend server handles:
+• RESTful API endpoints (/upload, /translate, /results, /download)
+• Image request and response management
+• Communication between AI models (LDM and BLIP-2)
+• Asynchronous task scheduling and processing
+• Error handling and validation
+• Temporary file storage with 24-hour TTL
+• Automatic cleanup of old files
+The backend ensures smooth integration of all system components with proper error recovery and logging.
+
+
+
+
+
+ User-Friendly Web Interface
+
+
+
+
+
+The React-based web application provides:
+• Clean and intuitive single-page application design
+• Simple drag-and-drop or browse upload interface
+• Real-time processing status indicators
+• Side-by-side SAR and optical image comparison
+• Scene description display panel
+• Download options for outputs (individual or ZIP)
+• Responsive design supporting desktop and tablet
+• Modern UI with 
+
+TailwindCSS
+
+ styling
+This ensures accessibility for both technical and non-technical users.
+
+
+
+
+
+Performance Evaluation and Monitoring
+
+
+
+
+
+The system includes comprehensive evaluation mechanisms:
+Image Quality Metrics:
+• PSNR (Peak Signal-to-Noise Ratio)
+• SSIM (Structural Similarity Index)
+• FID (Fréchet Inception Distance)
+• LPIPS (Learned Perceptual Image Patch Similarity)
+Baseline Comparison:
+• Pix2Pix GAN trained on identical SEN12MS data
+• Side-by-side quality comparison
+• Quantitative metric comparison
+Performance Monitoring:
+• Processing time tracking
+• Model inference latency
+• Memory usage monitoring
+This helps assess overall system effectiveness and demonstrates improvement over existing methods
+
+
+
+
+
+Tools and Technologies
+
+
+
+
+
+Programming Languages
+
+
+
+Python 3.9+: Primary language for backend development, deep learning model implementation, and data processing. Python provides the necessary ecosystem for AI research with extensive libraries for machine learning (
+
+PyTorch
+
+), geospatial processing (
+
+rasterio
+
+, GDAL), and scientific computing (NumPy, SciPy).
+JavaScript (ES6+): Used for frontend development with React framework, enabling responsive web interface and real-time user interactions.
+HTML5/CSS3: Standard web technologies for structure and styling, enhanced with 
+
+TailwindCSS
+
+ for rapid UI development.
+
+
+
+
+
+AI Frameworks and Libraries
+
+
+
+
+
+PyTorch
+
+ 2.0+: Primary deep learning framework for model training and inference. 
+
+PyTorch
+
+ offers dynamic computational graphs particularly well-suited for research-oriented work and easier debugging compared to TensorFlow.
+
+
+
+HuggingFace
+
+ Diffusers: Provides optimized implementations of Latent Diffusion Models (Stable Diffusion) with pre-trained checkpoints readily available. Abstracts the complexity of diffusion models while maintaining flexibility.
+
+
+HuggingFace
+
+ Transformers: Hosts BLIP-2 vision-language model with simple API for image captioning and scene understanding.
+OpenCV & Pillow: Industry-standard libraries for image preprocessing, transformations, and I/O operations.
+
+
+Rasterio
+
+ & GDAL: Specialized libraries for geospatial data handling, particularly 
+
+GeoTIFF
+
+ reading/writing with proper georeferencing support.
+
+
+
+
+
+Web Technologies
+
+
+
+
+
+FastAPI
+
+: Modern, high-performance web framework for building RESTful APIs. Chosen for automatic 
+
+OpenAPI
+
+ documentation, built-in request validation with 
+
+Pydantic
+
+, and async support for handling long-running model inference.
+React 18: Component-based UI library for building responsive single-page applications. Provides excellent developer experience with hot reloading via Vite build tool.
+
+
+TailwindCSS
+
+: Utility-first CSS framework enabling rapid UI development with responsive design patterns.
+Axios: Promise-based HTTP client for making API requests from frontend to backend.
+
+
+Uvicorn
+
+: High-performance ASGI server for running 
+
+FastAPI
+
+ applications in production.
+
+
+
+
+
+Development and Deployment Tools
+
+
+
+Docker: Containerization platform ensuring consistent deployment environments across development and production systems.
+Git/GitHub: Version control and code repository for collaboration and tracking changes throughout development.
+VS Code: Primary integrated development environment with extensions for Python, React, and Docker.
+
+
+Jupyter
+
+ Notebook: Interactive environment for data exploration, model experimentation, and result visualization.
+Weights & Biases (W&B): Experiment tracking platform for logging hyperparameters, metrics, and training progress (free for academic use).
+Postman: API testing tool for validating backend endpoints during development.
+
+
+
+
+
+
+
+
+
+
+
+
+
+Required hardware and Software resources
+
+
+
+
+
+Hardware
+
+
+
+Following development PC is required to develop this project
+
+
+
+Resource
+
+
+
+Minimum
+
+
+
+Recommended
+
+
+
+CPU
+
+
+
+
+
+Intel i5 / AMD Ryzen 5
+
+
+
+
+
+Intel i7 / AMD Ryzen 7
+
+
+
+RAM
+
+
+
+
+
+16 GB
+
+
+
+
+
+32 GB
+
+
+
+GPU
+
+
+
+
+
+4 GB VRAM (GTX 1650)
+
+
+
+
+
+12 GB VRAM (RTX 3080/4080)
+
+
+
+Storage
+
+
+
+
+
+256 GB SSD
+
+
+
+
+
+512 GB+ 
+
+NVMe
+
+ SSD
+
+
+
+Internet
+
+
+
+
+
+10 Mbps
+
+
+
+
+
+50 Mbps+ (for dataset download)
+
+
+
+
+
+
+
+
+
+Software
+
+
+
+Following 
+
+softwares
+
+ are required for the development of this project
+
+
+
+Software
+
+
+
+Purpose in Project
+
+
+
+Python 3.9+
+
+
+
+Core programming environment for backend, data processing, and AI models
+
+
+
+
+
+PyTorch
+
+ 2.0+
+
+
+
+Deep learning framework for training and optimizing diffusion models
+
+
+
+CUDA Toolkit 11.8+
+
+
+
+NVIDIA GPU acceleration essential for training diffusion models
+
+
+
+Node.js 18+
+
+
+
+JavaScript runtime for React frontend development
+
+
+
+VS Code / PyCharm
+
+
+
+IDEs for writing, debugging, and managing project codebase
+
+
+
+Docker Desktop
+
+
+
+Containerization for consistent deployment environments
+
+
+
+Git
+
+
+
+Version control for tracking code changes and collaboration
+
+
+
+
+
+Jupyter
+
+ Notebook
+
+
+
+Interactive environment for data exploration and model prototyping
+
+
+
+Postman
+
+
+
+API endpoint testing during backend development
+
+
+
+Web Browser
+
+
+
+Chrome/Firefox/Safari latest versions for frontend testing
+
+
+
+
+
+
+
+
+
+High Level Diagram
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Timeline
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Datasets and Pre-trained Models
+
+
+
+
+
+6.1 Primary Dataset
+
+
+
+Attribute
+
+
+
+Details
+
+
+
+Dataset Name
+
+
+
+SEN12MS - A Curated Dataset of Georeferenced Multi-Spectral Sentinel-1/2 Imagery
+
+
+
+Official Link
+
+
+
+https://mediatum.ub.tum.de/1474000
+
+
+
+IEEE 
+
+DataPort
+
+
+
+
+
+https://ieee-dataport.org/open-access/sen12ms
+
+
+
+GitHub Repository
+
+
+
+https://github.com/schmitt-muc/SEN12MS
+
+
+
+Paper (
+
+ArXiv
+
+)
+
+
+
+https://arxiv.org/abs/1906.07789
+
+
+
+Size
+
+
+
+~180,662 image triplets
+Sentinel-1 SAR: 47 GB
+Sentinel-2 Optical: 123 GB
+
+
+
+Coverage
+
+
+
+Global, all seasons, diverse land cover types
+
+
+
+Modalities
+
+
+
+Sentinel-1: VV + VH polarization
+Sentinel-2: 13 spectral bands
+MODIS: Land cover labels
+
+
+
+Format
+
+
+
+
+
+GeoTIFF
+
+, 256×
+
+256 pixel
+
+ patches
+
+
+
+
+
+
+
+
+
+6.2 Alternative/Supplementary Datasets
+
+
+
+
+
+	QXS-SAROPT: https://github.com/yaoxu008/QXS-SAROPT
+
+
+
+
+
+	SEN12MS-CR (Cloud-Removed): https://github.com/PatrickTUM/SEN12MS-CR
+
+
+
+
+
+	
+
+SpaceNet
+
+ 6 (SAR): https://spacenet.ai/sn6-challenge/
+
+
+
+
+
+6.3 Pre-trained Models
+
+
+
+Model
+
+
+
+
+
+HuggingFace
+
+ Link
+
+
+
+Purpose
+
+
+
+Stable Diffusion v1.5
+
+
+
+
+
+runwayml
+
+/stable-diffusion-v1-5
+
+
+
+Base LDM for fine-tuning
+
+
+
+Stable Diffusion v2.1
+
+
+
+
+
+stabilityai
+
+/stable-diffusion-2-1
+
+
+
+Alternative newer version
+
+
+
+BLIP-2 (OPT-2.7B)
+
+
+
+Salesforce/blip2-opt-2.7b
+
+
+
+Scene description generation
+
+
+
+Pix2Pix
+
+
+
+github.com/
+
+junyanz
+
+/pytorch-CycleGAN-and-pix2pix
+
+
+
+Baseline comparison
+
+
+
+
+
+
+
+
+
+
+Literature Review
+
+
+
+Category
+
+
+
+Paper Title
+
+
+
+Authors & Year
+
+
+
+Key Contribution
+
+
+
+Relevance
+
+
+
+Diffusion Models
+
+
+
+Denoising Diffusion Probabilistic Models
+
+
+
+Ho et al., 2020
+
+
+
+Introduced DDPM framework for generative modeling
+
+
+
+Foundation for understanding diffusion process
+
+
+
+Diffusion Models
+
+
+
+High-Resolution Image Synthesis with Latent Diffusion Models
+
+
+
+Rombach et al., 2022
+
+
+
+Stable Diffusion architecture working in latent space
+
+
+
+Core model we will use for SAR translation
+
+
+
+Diffusion Models
+
+
+
+Diffusion Models Beat GANs on Image Synthesis
+
+
+
+Dhariwal & Nichol, 2021
+
+
+
+Proved diffusion superiority for image quality
+
+
+
+Justifies choice over GAN methods
+
+
+
+SAR Fundamentals
+
+
+
+Synthetic Aperture Radar: Systems and Signal Processing
+
+
+
+
+
+Curlander
+
+ & McDonough, 1991
+
+
+
+SAR imaging principles and physics
+
+
+
+Background on SAR characteristics
+
+
+
+SAR Translation
+
+
+
+Image-to-Image Translation with Conditional Adversarial Networks
+
+
+
+Isola et al., 2017
+
+
+
+Pix2Pix conditional GAN framework
+
+
+
+Primary baseline for comparison
+
+
+
+SAR Translation
+
+
+
+Translating SAR to Optical Images for Assisted Interpretation
+
+
+
+Merkle et al., 2018
+
+
+
+SAR-to-optical using GANs
+
+
+
+Domain-specific existing approach
+
+
+
+SAR Translation
+
+
+
+SAR-to-Optical Image Translation via Thermodynamics-inspired Network
+
+
+
+Wang et al., 2023
+
+
+
+Diffusion for SAR with physical constraints
+
+
+
+Most similar recent work
+
+
+
+SAR Translation
+
+
+
+Diffusion Models for SAR to Optical Translation on Sentinel Data
+
+
+
+Ebel et al., 2022
+
+
+
+Diffusion on Sentinel-1/2 data
+
+
+
+Directly uses similar data sources
+
+
+
+Conditional Diffusion
+
+
+
+Adding Conditional Control to Diffusion Models (ControlNet)
+
+
+
+Zhang & 
+
+Agrawala
+
+, 2023
+
+
+
+ControlNet for spatial conditioning
+
+
+
+Potential conditioning mechanism
+
+
+
+Conditional Diffusion
+
+
+
+Classifier-Free Diffusion Guidance
+
+
+
+Ho & Salimans, 2022
+
+
+
+Guidance techniques for conditional generation
+
+
+
+Technical approach for conditioning
+
+
+
+Vision-Language
+
+
+
+BLIP: Bootstrapping Language-Image Pre-training
+
+
+
+Li et al., 2022
+
+
+
+Vision-language model for captioning
+
+
+
+For scene description module
+
+
+
+Vision-Language
+
+
+
+BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders
+
+
+
+Li et al., 2023
+
+
+
+Improved BLIP with Q-Former
+
+
+
+Actual model we will use
+
+
+
+Vision Transformers
+
+
+
+An Image is Worth 16x16 Words
+
+
+
+
+
+Dosovitskiy
+
+ et al., 2021
+
+
+
+Vision Transformer architecture
+
+
+
+Understanding 
+
+ViT
+
+ components
+
+
+
+Dataset
+
+
+
+SEN12MS Dataset Paper
+
+
+
+Schmitt et al., 2019
+
+
+
+Paired SAR-Optical-Semantic dataset
+
+
+
+Our primary data source - must cite
+
+
+
+Evaluation Metrics
+
+
+
+The Unreasonable Effectiveness of Deep Features
+
+
+
+Zhang et al., 2018
+
+
+
+LPIPS perceptual metric
+
+
+
+Better than PSNR for quality
+
+
+
+Evaluation Metrics
+
+
+
+GANs Trained by Two Time-Scale Update Rule
+
+
+
+Heusel et al., 2017
+
+
+
+Fréchet Inception Distance
+
+
+
+Distribution similarity metric
+
+
+
+Remote Sensing
+
+
+
+Deep Learning for SAR Image Understanding
+
+
+
+Zhu et al., 2020
+
+
+
+Survey of DL in SAR applications
+
+
+
+Context for application domain
+
+
+
+Image Quality
+
+
+
+Image Quality Assessment: From Error Visibility to Structural Similarity
+
+
+
+Wang et al., 2004
+
+
+
+SSIM metric
+
+
+
+Standard quality metric
+
+
+
+Transfer Learning
+
+
+
+A Survey on Transfer Learning
+
+
+
+Pan & Yang, 2010
+
+
+
+Transfer learning fundamentals
+
+
+
+Understanding fine-tuning
+
+
+
+Methodology
+
+
+
+Analyzing and Improving Image Quality of StyleGAN
+
+
+
+Karras et al., 2020
+
+
+
+Ablation study methodology
+
+
+
+Template for evaluation design
+
+
+
+
+
+References
+
+
+
+
+
+	Ho, J., Jain, A., & 
+
+Abbeel
+
+, P. (2020). Denoising Diffusion Probabilistic Models. 
+
+NeurIPS
+
+ 2020. https://arxiv.org/abs/2006.11239
+
+
+
+
+
+	Rombach, R., Blattmann, A., Lorenz, D., Esser, P., & 
+
+Ommer
+
+, B. (2022). High-Resolution Image Synthesis with Latent Diffusion Models. CVPR 2022. https://arxiv.org/abs/2112.10752
+
+
+
+
+
+	Isola, P., Zhu, J. Y., Zhou, T., & Efros, A. A. (2017). Image-to-Image Translation with Conditional Adversarial Networks. CVPR 2017. https://arxiv.org/abs/1611.07004
+
+
+
+
+
+	Li, J., Li, D., Savarese, S., & Hoi, S. (2023). BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models. ICML 2023. https://arxiv.org/abs/2301.12597
+
+
+
+
+
+	Schmitt, M., Hughes, L. H., Qiu, C., & Zhu, X. X. (2019). SEN12MS – A Curated Dataset of Georeferenced Multi-Spectral Sentinel-1/2 Imagery for Deep Learning and Data Fusion. ISPRS Annals 2019. https://arxiv.org/abs/1906.07789
+
+
+
+
+
+	Wang, Y., et al. (2023). SAR-to-Optical Image Translation via Thermodynamics-inspired Network. IEEE Transactions on Geoscience and Remote Sensing. https://arxiv.org/abs/2210.16776
+
+
+
+
+
+	Ebel, P., Saha, S., & Zhu, X. X. (2022). Fusing Multi-modal Data for Supervised Change Detection. ISPRS Journal 2022.
+
+
+
+
+
+	Zhang, L., & 
+
+Agrawala
+
+, M. (2023). Adding Conditional Control to Text-to-Image Diffusion Models. ICCV 2023. https://arxiv.org/abs/2302.05543
+
+
+
+
+
+	Dhariwal, P., & Nichol, A. (2021). Diffusion Models Beat GANs on Image Synthesis. 
+
+NeurIPS
+
+ 2021. https://arxiv.org/abs/2105.05233
+
+
+
+
+
+	Zhang, R., Isola, P., Efros, A. A., Shechtman, E., & Wang, O. (2018). The Unreasonable Effectiveness of Deep Features as a Perceptual Metric. CVPR 2018.
+
+
+
+
+
+	
+
+HuggingFace
+
+ Diffusers Documentation. https://huggingface.co/docs/diffusers
+
+
+
+
+
+	
+
+FastAPI
+
+ Documentation. https://fastapi.tiangolo.com/
+
+
+
+
+
+	React Documentation. https://react.dev/
+
+
+
+
+
+	
+
+PyTorch
+
+ Documentation. https://pytorch.org/docs/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
