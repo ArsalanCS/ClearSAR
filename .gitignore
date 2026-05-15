@@ -1,0 +1,7 @@
+.DS_Store
+.claude/
+clearsar-app/node_modules/
+clearsar-app/dist/
+node_modules/
+dist/
+*.tsbuildinfo
