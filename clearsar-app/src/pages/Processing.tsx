@@ -62,12 +62,10 @@ export default function Processing({ onNavigate, onComplete }: Props) {
     <section className="page on" id="p-processing">
       <div className="ph">
         <div>
-          <div className="num">§ 03 · PROCESSING</div>
           <h1>Translating scene…</h1>
           <p>Latent diffusion inference in progress. Results will appear in Scene Viewer on completion.</p>
         </div>
         <div className="ph-aside">
-          <span className="chip hi"><span className="d" />LIVE · GPU A100</span>
           <button className="btn ghost" onClick={() => onNavigate('upload')}>Cancel</button>
         </div>
       </div>

@@ -83,8 +83,6 @@ export default function CompareSlider({ idleAnimate = true }: Props) {
     >
       <div className="layer sar" />
       <div className="layer opt" style={{ clipPath: `inset(0 ${100 - pct}% 0 0)` }} />
-      <div className="tag sar">SAR · raw backscatter</div>
-      <div className="tag opt">OPTICAL · generated</div>
       <svg className="cross" viewBox="0 0 70 70">
         <circle cx="35" cy="35" r="26"/>
         <circle cx="35" cy="35" r="14"/>

@@ -19,7 +19,6 @@ export default function Landing({ onNavigate }: Props) {
             <line x1="12" y1="2" x2="12" y2="22" stroke="#ff6a2c" strokeWidth=".6" strokeDasharray="1 2"/>
           </svg>
           <b>ClearSAR</b>
-          <span className="v">v0.4.2</span>
         </div>
         <nav className="lnav-links">
           <a href="#capability">Capability</a>
@@ -29,7 +28,6 @@ export default function Landing({ onNavigate }: Props) {
           <a href="#team">Team</a>
         </nav>
         <div className="lnav-actions">
-          <button className="btn ghost" onClick={() => onNavigate('upload')}>Sign in</button>
           <button className="btn primary" onClick={() => onNavigate('upload')}>
             Launch Console →
           </button>
@@ -272,34 +270,6 @@ export default function Landing({ onNavigate }: Props) {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="lfoot">
-        <div>
-          <div className="lnav-brand" style={{ marginBottom: 12 }}>
-            <svg viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="#ff6a2c" strokeWidth="1.2"/>
-              <circle cx="12" cy="12" r="5" stroke="#ff6a2c" strokeWidth="1.2"/>
-              <circle cx="12" cy="12" r="1.5" fill="#ff6a2c"/>
-            </svg>
-            <b>ClearSAR</b>
-          </div>
-          <p>Department of Computer Science · FAST-NUCES, Chiniot-Faisalabad · 2026</p>
-        </div>
-        <div className="lfoot-cols">
-          <div>
-            <div className="lbl">Product</div>
-            <a>Console</a><a>API</a><a>Pricing</a>
-          </div>
-          <div>
-            <div className="lbl">Research</div>
-            <a>Paper</a><a>SEN12MS</a><a>Model card</a>
-          </div>
-          <div>
-            <div className="lbl">Contact</div>
-            <a>Email</a><a>GitHub</a><a>Brief</a>
-          </div>
-        </div>
-      </footer>
     </section>
   )
 }

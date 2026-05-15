@@ -15,13 +15,9 @@ export default function Results({ onNavigate }: Props) {
     <section className="page on" id="p-results">
       <div className="ph">
         <div>
-          <div className="num">§ 04 · SCENE · 0x8F2A</div>
-          <h1>Rann of Kutch · floodplain survey</h1>
-          <p>Translation complete in 38.2 s · Confidence 0.82 · Acquired 2026-04-12 18:42 Z</p>
+          <h1>Translation result</h1>
         </div>
         <div className="ph-aside">
-          <span className="chip ok"><span className="d" />COMPLETED</span>
-          <button className="btn ghost">Annotate</button>
           <button className="btn primary">Export PDF</button>
         </div>
       </div>
@@ -40,9 +36,6 @@ export default function Results({ onNavigate }: Props) {
                 </span>
               ))}
             </div>
-            <div className="coords">
-              34.128°N · 72.442°E · Sentinel-1 · 2026-04-12 18:42Z
-            </div>
           </div>
           <div className="viewer-stage">
             <CompareSlider idleAnimate={activeTab === 0} />
@@ -50,53 +43,6 @@ export default function Results({ onNavigate }: Props) {
         </div>
 
         <div className="side-panel">
-          <div className="caption-block">
-            <div className="lbl hi">// BLIP-2 · Scene description</div>
-            <div className="caption">
-              <span className="q">&ldquo;</span>
-              A wide floodplain with a meandering river cutting east to west, agricultural
-              fields on the north bank, and scattered settlements to the southeast. Minor
-              inundation visible along the northwest tributary.
-              <span className="q">&rdquo;</span>
-            </div>
-            <div className="tags">
-              <span className="t">floodplain</span>
-              <span className="t">river</span>
-              <span className="t">agriculture</span>
-              <span className="t">settlement</span>
-              <span className="t">flooding</span>
-            </div>
-          </div>
-
-          <div className="caption-block">
-            <div className="lbl">// Caption confidence</div>
-            <div className="conf">
-              <div className="bar"><div /></div>
-              <div className="v">0.82</div>
-            </div>
-          </div>
-
-          <div className="caption-block" style={{ padding: 14 }}>
-            <div className="lbl" style={{ marginBottom: 10 }}>// Translation metrics</div>
-            <div className="met-grid">
-              <div className="mc">
-                <div className="lbl">PSNR ↑</div>
-                <div className="v">22.1</div>
-                <div className="d">+3.4 Δ</div>
-              </div>
-              <div className="mc">
-                <div className="lbl">SSIM ↑</div>
-                <div className="v">0.64</div>
-                <div className="d">+0.12 Δ</div>
-              </div>
-              <div className="mc">
-                <div className="lbl">LPIPS ↓</div>
-                <div className="v">0.19</div>
-                <div className="d">−0.07 Δ</div>
-              </div>
-            </div>
-          </div>
-
           <div className="caption-block">
             <div className="lbl" style={{ marginBottom: 10 }}>// Export</div>
             <div className="act-col">

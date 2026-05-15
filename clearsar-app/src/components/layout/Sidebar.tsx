@@ -9,11 +9,11 @@ const NAV_ITEMS = [
   {
     section: '// Workspace',
     items: [
-      { id: 'landing' as PageId, label: 'Overview', shortcut: 'G', icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>) },
-      { id: 'upload' as PageId, label: 'New translation', shortcut: 'N', icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M12 4v12m0 0l-4-4m4 4l4-4M5 20h14"/></svg>) },
-      { id: 'processing' as PageId, label: 'Active runs', shortcut: 'R', icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>) },
-      { id: 'results' as PageId, label: 'Scene viewer', shortcut: 'V', icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="3" y="4" width="18" height="16" rx="1"/><line x1="12" y1="4" x2="12" y2="20"/></svg>) },
-      { id: 'dashboard' as PageId, label: 'Library', shortcut: 'L', icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>) },
+      { id: 'landing' as PageId, label: 'Overview', icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>) },
+      { id: 'upload' as PageId, label: 'New translation', icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M12 4v12m0 0l-4-4m4 4l4-4M5 20h14"/></svg>) },
+      { id: 'processing' as PageId, label: 'Active runs', icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>) },
+      { id: 'results' as PageId, label: 'Scene viewer', icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="3" y="4" width="18" height="16" rx="1"/><line x1="12" y1="4" x2="12" y2="20"/></svg>) },
+      { id: 'dashboard' as PageId, label: 'Library', icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>) },
     ],
   },
   {
@@ -36,12 +36,6 @@ export default function Sidebar({ current, onNavigate }: Props) {
           <line x1="12" y1="2" x2="12" y2="22" stroke="#ff6a2c" strokeWidth=".6" strokeDasharray="1 2"/>
         </svg>
         ClearSAR
-        <span className="v">v0.4.2</span>
-      </div>
-
-      <div className="tenant">
-        <span>TENANT</span>
-        <b>FAST-NUCES / FYP-26</b>
       </div>
 
       <nav>
@@ -56,7 +50,6 @@ export default function Sidebar({ current, onNavigate }: Props) {
               >
                 {item.icon}
                 {item.label}
-                <span className="k">{item.shortcut}</span>
               </div>
             ))}
           </div>
@@ -70,13 +63,6 @@ export default function Sidebar({ current, onNavigate }: Props) {
         </div>
       </nav>
 
-      <div className="sidebar-user">
-        <div className="user-av">AH</div>
-        <div className="user-info">
-          Arsalan Hassan
-          <small>analyst · 22F-3050</small>
-        </div>
-      </div>
     </aside>
   )
 }

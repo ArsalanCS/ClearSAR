@@ -1,26 +1,8 @@
-import React from 'react'
-
 const METRICS = [
-  { label: 'PSNR ↑',  ours: 22.4, base: 18.7, delta: '+3.7',  ousPct: 90,  basePct: 70,  down: false },
-  { label: 'SSIM ↑',  ours: 0.63, base: 0.51, delta: '+0.12', ousPct: 63,  basePct: 51,  down: false },
-  { label: 'LPIPS ↓', ours: 0.21, base: 0.32, delta: '−0.11', ousPct: 42,  basePct: 64,  down: true  },
-  { label: 'FID ↓',   ours: 31.2, base: 64.1, delta: '−32.9', ousPct: 31,  basePct: 64,  down: true  },
-]
-
-const SAMPLES = [
-  { idx: '001', sarStyle: {}, gtStyle: {}, oursStyle: {}, pxStyle: {} },
-  { idx: '002',
-    sarStyle:  { background: 'radial-gradient(circle at 60% 30%, #444, #0a0a0a 70%)' },
-    gtStyle:   { background: 'linear-gradient(135deg, #4a3a40, #c8a18a 50%, #6a8fb5)' },
-    oursStyle: { background: 'linear-gradient(135deg, #5a4a50, #d8b19a 50%, #7a9fc5)', borderColor: 'var(--accent)' },
-    pxStyle:   { background: 'linear-gradient(135deg, #3a2a30, #78716a 50%, #4a6585)' },
-  },
-  { idx: '003',
-    sarStyle:  { background: 'radial-gradient(circle at 50% 70%, #353535, #0a0a0a 70%)' },
-    gtStyle:   { background: 'linear-gradient(135deg, #2a5a60, #a3d1ba 50%, #4a9fa5)' },
-    oursStyle: { background: 'linear-gradient(135deg, #3a6a70, #b3e1ca 50%, #5aafb5)', borderColor: 'var(--accent)' },
-    pxStyle:   { background: 'linear-gradient(135deg, #1a4045, #6a9180 50%, #2a6f75)' },
-  },
+  { label: 'PSNR ↑',  ours: 22.4, base: 18.7, delta: '+3.7',  ousPct: 90, basePct: 70 },
+  { label: 'SSIM ↑',  ours: 0.63, base: 0.51, delta: '+0.12', ousPct: 63, basePct: 51 },
+  { label: 'LPIPS ↓', ours: 0.21, base: 0.32, delta: '−0.11', ousPct: 42, basePct: 64 },
+  { label: 'FID ↓',   ours: 31.2, base: 64.1, delta: '−32.9', ousPct: 31, basePct: 64 },
 ]
 
 export default function Evaluation() {
@@ -28,7 +10,6 @@ export default function Evaluation() {
     <section className="page on" id="p-admin">
       <div className="ph">
         <div>
-          <div className="num">§ 06 · MODEL EVALUATION</div>
           <h1>SD-v1.5-SAR-FT · v0.4.2</h1>
           <p>Test set 2,040 scenes from SEN12MS holdout · Baseline Pix2Pix trained on identical split.</p>
         </div>
@@ -157,33 +138,6 @@ export default function Evaluation() {
         </div>
       </div>
 
-      {/* Sample viewer */}
-      <div className="admin-samples">
-        <div className="samples-head">
-          <h4>Sample viewer · seed 42 · first 3 / 2040</h4>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button className="btn ghost">◀ Prev</button>
-            <button className="btn ghost">Next ▶</button>
-          </div>
-        </div>
-        <div className="samples-grid">
-          <div className="col-h">#</div>
-          <div className="col-h">SAR input</div>
-          <div className="col-h">Ground truth</div>
-          <div className="col-h hi">Ours (LDM)</div>
-          <div className="col-h">Pix2Pix</div>
-
-          {SAMPLES.map(s => (
-            <React.Fragment key={s.idx}>
-              <div className="idx">{s.idx}</div>
-              <div className="sx sar"  style={s.sarStyle}  />
-              <div className="sx gt"   style={s.gtStyle}   />
-              <div className="sx ours" style={s.oursStyle} />
-              <div className="sx px"   style={s.pxStyle}   />
-            </React.Fragment>
-          ))}
-        </div>
-      </div>
     </section>
   )
 }

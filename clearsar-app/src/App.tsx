@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
 import { PageId } from './types'
-import ClassBar from './components/layout/ClassBar'
 import ScanLine from './components/layout/ScanLine'
 import Sidebar from './components/layout/Sidebar'
 import TopBar from './components/layout/TopBar'
@@ -51,17 +50,7 @@ export default function App() {
     <>
       <ScanLine />
 
-      {/* Corner decorators */}
-      <div className="corner tl" aria-hidden="true">
-        LAT 34.128°N · LON 72.442°E · UTC 18:42Z · AOI 0x8F2A
-      </div>
-      <div className="corner br" aria-hidden="true">
-        CLEARSAR v0.4.2 · FYP-2026 · NODE 03
-      </div>
-
       <div className="app-shell">
-        <ClassBar />
-
         <div className={`shell${isLanding ? ' landing-mode' : ''}`}>
           <Sidebar current={page} onNavigate={navigate} />
 

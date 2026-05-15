@@ -23,7 +23,6 @@ export default function Upload({ onNavigate }: Props) {
     <section className="page on" id="p-upload">
       <div className="ph">
         <div>
-          <div className="num">§ 02 · UPLOAD</div>
           <h1>Drop a SAR scene to begin.</h1>
           <p>Giant target, minimal friction. Supports Sentinel-1, Capella, and ICEYE GeoTIFFs. Max 50 MB per file.</p>
         </div>
@@ -75,34 +74,6 @@ export default function Upload({ onNavigate }: Props) {
         </div>
 
         <div className="upload-side">
-          <div className="panel-card">
-            <h4>Recent uploads</h4>
-            <div className="recent-item" onClick={() => onNavigate('results')}>
-              <div className="recent-thumb" />
-              <div className="recent-meta">
-                <b>RANN_20260412.tif</b>
-                <small>28.4 MB · 2h ago · done</small>
-              </div>
-              <span className="lbl ok">✓</span>
-            </div>
-            <div className="recent-item">
-              <div className="recent-thumb" />
-              <div className="recent-meta">
-                <b>KARACHI_COAST.tif</b>
-                <small>22.1 MB · 5h ago · done</small>
-              </div>
-              <span className="lbl ok">✓</span>
-            </div>
-            <div className="recent-item">
-              <div className="recent-thumb" />
-              <div className="recent-meta">
-                <b>SWAT_VALLEY.tif</b>
-                <small>31.8 MB · yesterday</small>
-              </div>
-              <span className="lbl ok">✓</span>
-            </div>
-          </div>
-
           <div className="panel-card">
             <h4>File requirements</h4>
             <div className="help-row">
