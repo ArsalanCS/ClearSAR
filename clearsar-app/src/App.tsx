@@ -22,6 +22,7 @@ const KEY_MAP: Record<string, PageId> = {
 export default function App() {
   const [page, setPage] = useState<PageId>('landing')
   const [toast, setToast] = useState(false)
+  const [jobId, setJobId] = useState<string | null>(null)
 
   const navigate = useCallback((to: PageId) => {
     setPage(to)
@@ -58,10 +59,10 @@ export default function App() {
             {!isLanding && <TopBar page={page} />}
 
             {page === 'landing'    && <Landing    onNavigate={navigate} />}
-            {page === 'upload'     && <Upload     onNavigate={navigate} />}
-            {page === 'processing' && <Processing onNavigate={navigate} onComplete={showToast} />}
-            {page === 'results'    && <Results    onNavigate={navigate} />}
-            {page === 'dashboard'  && <Library    onNavigate={navigate} />}
+            {page === 'upload'     && <Upload     onNavigate={navigate} onJobCreated={setJobId} />}
+            {page === 'processing' && <Processing onNavigate={navigate} onComplete={showToast} jobId={jobId} />}
+            {page === 'results'    && <Results    onNavigate={navigate} jobId={jobId} />}
+            {page === 'dashboard'  && <Library    onNavigate={navigate} onOpenScene={setJobId} />}
             {page === 'admin'      && <Evaluation />}
           </main>
         </div>

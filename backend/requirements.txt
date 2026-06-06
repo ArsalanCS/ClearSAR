@@ -1,0 +1,12 @@
+# --- Core API (always needed) ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+pydantic==2.10.4
+pydantic-settings==2.7.1
+pillow==11.1.0
+numpy==2.2.1
+
+# --- Local inference mode only (INFERENCE_MODE=local) ---
+# Heavy GPU deps. Install separately when running the model in-process:
+#   pip install -r requirements-local.txt

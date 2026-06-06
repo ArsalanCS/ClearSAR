@@ -504,6 +504,33 @@ body::after {
 .lfoot-cols a:hover { color: var(--accent); }
 
 /* ===================== UPLOAD PAGE ===================== */
+.cond-bar {
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  background: var(--panel); border: 1px solid var(--line);
+  padding: 14px 18px; margin-bottom: 16px;
+}
+.cond-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: .2em; text-transform: uppercase; color: var(--accent);
+}
+.cond-field {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: .15em; text-transform: uppercase; color: var(--ink-3);
+}
+.cond-select {
+  background: var(--bg); border: 1px solid var(--line-2); color: var(--ink);
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .1em;
+  padding: 6px 10px; text-transform: capitalize; cursor: pointer;
+}
+.cond-select:hover { border-color: var(--accent); }
+.cond-select:focus { outline: none; border-color: var(--accent); }
+.cond-preview {
+  margin-left: auto; font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: .05em; color: var(--ink-3);
+}
+.cond-preview b { color: var(--ink-2); font-weight: 400; }
+
 .dropzone-wrap { display: grid; grid-template-columns: 1fr 320px; gap: 24px; min-height: 560px; }
 .dropzone {
   border: 2px dashed var(--line-2); background: var(--panel);
@@ -649,14 +676,44 @@ body::after {
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px; color: var(--ink-2); letter-spacing: .1em;
 }
-.viewer-stage { position: relative; flex: 1; min-height: 500px; }
+.viewer-stage {
+  position: relative; flex: 1; min-height: 500px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255,255,255,.025), transparent 70%),
+    linear-gradient(180deg, var(--bg-2), var(--bg));
+}
+
+/* Square, fully-visible image stage — never crops the scene */
+.image-stage {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  aspect-ratio: 1 / 1;
+  margin: auto;
+  border: 1px solid var(--line-2);
+  box-shadow: 0 12px 48px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.02);
+  background: #000;
+  overflow: hidden;
+}
 
 /* Compare Slider */
 .compare {
   position: absolute; inset: 0; overflow: hidden;
   cursor: ew-resize; user-select: none;
 }
-.compare .layer { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.compare .layer {
+  position: absolute; inset: 0;
+  background-size: contain; background-position: center; background-repeat: no-repeat;
+}
+
+/* Single-image tabs (SAR only / Optical only) */
+.single-view {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain; display: block;
+}
 .compare .layer.sar {
   background-image:
     radial-gradient(circle at 35% 45%, rgba(50,50,50,1), rgba(10,10,10,1) 70%),

@@ -2,9 +2,11 @@ import { useRef, useCallback, useEffect, useState } from 'react'
 
 interface Props {
   idleAnimate?: boolean
+  sarUrl?: string
+  optUrl?: string
 }
 
-export default function CompareSlider({ idleAnimate = true }: Props) {
+export default function CompareSlider({ idleAnimate = true, sarUrl, optUrl }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
   const draggingRef = useRef(false)
   const [pct, setPct] = useState(50)
@@ -73,24 +75,38 @@ export default function CompareSlider({ idleAnimate = true }: Props) {
   }, [pctFromEvent, setPctClamped, startIdle])
 
   return (
-    <div
-      ref={containerRef}
-      className="compare"
-      onMouseDown={onMouseDown}
-      onTouchStart={onTouchStart}
-      onMouseEnter={() => { if (idleTimerRef.current) clearInterval(idleTimerRef.current) }}
-      onMouseLeave={startIdle}
-    >
-      <div className="layer sar" />
-      <div className="layer opt" style={{ clipPath: `inset(0 ${100 - pct}% 0 0)` }} />
-      <svg className="cross" viewBox="0 0 70 70">
-        <circle cx="35" cy="35" r="26"/>
-        <circle cx="35" cy="35" r="14"/>
-        <line x1="0" y1="35" x2="70" y2="35"/>
-        <line x1="35" y1="0" x2="35" y2="70"/>
-        <circle cx="35" cy="35" r="2" fill="#ff6a2c" stroke="none"/>
-      </svg>
-      <div className="handle" style={{ left: `${pct}%` }} />
+    <div className="image-stage">
+      <div
+        ref={containerRef}
+        className="compare"
+        onMouseDown={onMouseDown}
+        onTouchStart={onTouchStart}
+        onMouseEnter={() => { if (idleTimerRef.current) clearInterval(idleTimerRef.current) }}
+        onMouseLeave={startIdle}
+      >
+        <div
+          className="layer sar"
+          style={sarUrl ? {
+            backgroundImage: `url(${sarUrl})`,
+            filter: 'grayscale(1) contrast(1.05)',
+          } : undefined}
+        />
+        <div
+          className="layer opt"
+          style={{
+            clipPath: `inset(0 ${100 - pct}% 0 0)`,
+            ...(optUrl ? { backgroundImage: `url(${optUrl})` } : {}),
+          }}
+        />
+        <svg className="cross" viewBox="0 0 70 70">
+          <circle cx="35" cy="35" r="26"/>
+          <circle cx="35" cy="35" r="14"/>
+          <line x1="0" y1="35" x2="70" y2="35"/>
+          <line x1="35" y1="0" x2="35" y2="70"/>
+          <circle cx="35" cy="35" r="2" fill="#ff6a2c" stroke="none"/>
+        </svg>
+        <div className="handle" style={{ left: `${pct}%` }} />
+      </div>
     </div>
   )
 }

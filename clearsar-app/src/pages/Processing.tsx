@@ -1,69 +1,87 @@
 import { useEffect, useRef, useState } from 'react'
 import { PageId } from '../types'
+import { getJob, JobState, Stage } from '../api'
 
 interface Props {
   onNavigate: (page: PageId) => void
   onComplete?: () => void
+  jobId: string | null
 }
 
 const CIRC = 2 * Math.PI * 140
 
-type StageStatus = 'done' | 'active' | 'pending'
-
-interface Stage {
-  label: string
-  time: string
-  status: StageStatus
+const STAGE_ORDER: Stage[] = ['ingest', 'encode', 'denoise', 'decode', 'done']
+const STAGE_LABELS: { stage: Stage; label: string; time: string }[] = [
+  { stage: 'ingest',  label: '01 · INGEST',  time: 'validate' },
+  { stage: 'encode',  label: '02 · ENCODE',  time: 'VAE enc' },
+  { stage: 'denoise', label: '03 · DENOISE', time: '50 steps' },
+  { stage: 'decode',  label: '04 · DECODE',  time: 'VAE dec' },
+  { stage: 'done',    label: '05 · OUTPUT',  time: 'PNG' },
+]
+const STAGE_TITLE: Record<Stage, string> = {
+  ingest: 'Ingest & validate',
+  encode: 'VAE latent encode',
+  denoise: 'Latent diffusion · DDIM denoise',
+  decode: 'VAE decode → optical RGB',
+  done: 'Finalizing',
 }
 
-export default function Processing({ onNavigate, onComplete }: Props) {
-  const [pct, setPct] = useState(0)
-  const [step, setStep] = useState(0)
-  const [eta, setEta] = useState(30)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+export default function Processing({ onNavigate, onComplete, jobId }: Props) {
+  const [job, setJob] = useState<JobState | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const firedRef = useRef(false)
 
   useEffect(() => {
-    setPct(0)
-    setStep(0)
-    setEta(30)
-
-    timerRef.current = setInterval(() => {
-      setPct(prev => {
-        const next = prev + 0.8
-        if (next >= 100) {
-          clearInterval(timerRef.current!)
+    if (!jobId) return
+    let active = true
+    const poll = async () => {
+      try {
+        const state = await getJob(jobId)
+        if (!active) return
+        setJob(state)
+        if (state.status === 'completed' && !firedRef.current) {
+          firedRef.current = true
           onComplete?.()
-          setTimeout(() => onNavigate('results'), 1200)
-          return 100
+          setTimeout(() => onNavigate('results'), 900)
+        } else if (state.status === 'failed') {
+          setError(state.error || 'Translation failed')
+        } else if (state.status === 'running' || state.status === 'queued') {
+          timer = setTimeout(poll, 500)
         }
-        return next
-      })
-    }, 180)
+      } catch (e) {
+        if (!active) return
+        setError(e instanceof Error ? e.message : 'Lost connection to backend')
+      }
+    }
+    let timer: ReturnType<typeof setTimeout>
+    poll()
+    return () => { active = false; clearTimeout(timer) }
+  }, [jobId, onNavigate, onComplete])
 
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [onNavigate, onComplete])
-
-  useEffect(() => {
-    setStep(Math.min(50, Math.floor(pct * 0.5)))
-    setEta(Math.max(1, Math.floor((100 - pct) * 0.3)))
-  }, [pct])
-
+  const pct = job?.progress ?? 0
+  const currentStage: Stage = job?.stage ?? 'ingest'
+  const stageIdx = STAGE_ORDER.indexOf(currentStage)
   const dashArray = `${(pct / 100) * CIRC} ${CIRC}`
 
-  const stages: Stage[] = [
-    { label: '✓ 01 · INGEST', time: '1.2 s',  status: pct > 5  ? 'done' : pct > 0 ? 'active' : 'pending' },
-    { label: '✓ 02 · ENCODE', time: '0.4 s',  status: pct > 15 ? 'done' : pct > 5  ? 'active' : 'pending' },
-    { label: '◉ 03 · DENOISE', time: '~12 s', status: pct > 80 ? 'done' : pct > 15 ? 'active' : 'pending' },
-    { label: '04 · DECODE',    time: '~0.3 s', status: pct > 90 ? 'done' : pct > 80 ? 'active' : 'pending' },
-    { label: '05 · CAPTION',   time: '~5 s',  status: pct >= 100 ? 'done' : pct > 90 ? 'active' : 'pending' },
-  ]
+  if (!jobId) {
+    return (
+      <section className="page on" id="p-processing">
+        <div className="processing-wrap">
+          <div className="proc-stage">No active run.</div>
+          <button className="btn primary" onClick={() => onNavigate('upload')}>Start a translation →</button>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="page on" id="p-processing">
       <div className="ph">
         <div>
-          <h1>Translating scene…</h1>
-          <p>Latent diffusion inference in progress. Results will appear in Scene Viewer on completion.</p>
+          <h1>{error ? 'Translation failed' : 'Translating scene…'}</h1>
+          <p>{error
+            ? 'The backend reported an error during inference.'
+            : 'Latent diffusion inference in progress. Results appear in Scene Viewer on completion.'}</p>
         </div>
         <div className="ph-aside">
           <button className="btn ghost" onClick={() => onNavigate('upload')}>Cancel</button>
@@ -76,54 +94,44 @@ export default function Processing({ onNavigate, onComplete }: Props) {
             <circle cx="160" cy="160" r="140" fill="none" stroke="#1e232d" strokeWidth="3"/>
             <circle
               cx="160" cy="160" r="140"
-              fill="none" stroke="#ff6a2c" strokeWidth="3"
+              fill="none" stroke={error ? '#ff4d5a' : '#ff6a2c'} strokeWidth="3"
               strokeLinecap="round"
               strokeDasharray={dashArray}
-              style={{ filter: 'drop-shadow(0 0 8px #ff6a2c)' }}
+              style={{ filter: `drop-shadow(0 0 8px ${error ? '#ff4d5a' : '#ff6a2c'})`, transition: 'stroke-dasharray .4s' }}
             />
             <circle cx="160" cy="160" r="110" fill="none" stroke="#2a313d" strokeWidth="1" strokeDasharray="2 6"/>
-            <g fill="#5b6472" fontFamily="JetBrains Mono" fontSize="9">
-              <text x="160" y="22" textAnchor="middle">◆</text>
-              <text x="160" y="308" textAnchor="middle">◆</text>
-              <text x="22" y="163" textAnchor="middle">◆</text>
-              <text x="298" y="163" textAnchor="middle">◆</text>
-            </g>
           </svg>
           <div className="proc-center">
-            <div className="st">DIFFUSING</div>
-            <div className="pct">
-              <em>{Math.floor(pct)}</em>%
-            </div>
+            <div className="st">{error ? 'ERROR' : currentStage.toUpperCase()}</div>
+            <div className="pct"><em>{Math.floor(pct)}</em>%</div>
           </div>
         </div>
 
-        <div className="proc-stage">
-          Stage {pct < 15 ? 1 : pct < 80 ? 3 : pct < 90 ? 4 : 5} / 5 ·{' '}
-          {pct < 5 ? 'Ingest & validate' : pct < 15 ? 'Encode' : pct < 80 ? `Latent denoise (step ${step} / 50)` : pct < 90 ? 'Decode optical' : 'Generating caption'}
-        </div>
-        <div className="proc-eta">ETA · {eta}s remaining</div>
-
+        {error ? (
+          <div className="proc-stage" style={{ color: 'var(--danger)' }}>{error}</div>
+        ) : (
+          <div className="proc-stage">
+            Stage {Math.max(1, stageIdx + 1)} / 5 · {STAGE_TITLE[currentStage]}
+          </div>
+        )}
         <div className="proc-file">
-          <span>RANN_20260412.tif</span>
-          <span className="sep" />
-          <span>28.4 MB</span>
-          <span className="sep" />
-          <span>Sentinel-1 · VV + VH</span>
-          <span className="sep" />
-          <span>256²</span>
+          <span>{job?.filename ?? '—'}</span>
         </div>
 
         <div className="proc-steps">
-          {stages.map(s => (
-            <div key={s.label} className={`s ${s.status}`}>
-              <div className="sn">{s.label}</div>
-              <div className="sv">{s.time}</div>
-            </div>
-          ))}
+          {STAGE_LABELS.map((s, i) => {
+            const cls = i < stageIdx ? 'done' : i === stageIdx ? 'active' : 'pending'
+            return (
+              <div key={s.stage} className={`s ${error ? 'pending' : cls}`}>
+                <div className="sn">{i < stageIdx ? '✓ ' : ''}{s.label}</div>
+                <div className="sv">{s.time}</div>
+              </div>
+            )
+          })}
         </div>
 
         <button className="btn ghost" onClick={() => onNavigate('upload')}>
-          Abort run
+          {error ? 'Try another scene' : 'Abort run'}
         </button>
       </div>
     </section>

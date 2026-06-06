@@ -1,0 +1,9 @@
+# Heavy deps for running the diffusion model in-process (INFERENCE_MODE=local).
+# Requires a CUDA GPU for reasonable latency (~3-5s on a T4; minutes on CPU).
+torch>=2.2
+diffusers>=0.32.2
+transformers>=4.49.0
+accelerate>=1.4.0
+peft>=0.19.0
+safetensors>=0.4.5
+huggingface_hub>=0.27.0

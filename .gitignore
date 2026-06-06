@@ -1,7 +1,25 @@
+# OS
 .DS_Store
+
+# Editor / tooling
 .claude/
+*.tsbuildinfo
+
+# Node / frontend
+node_modules/
 clearsar-app/node_modules/
 clearsar-app/dist/
-node_modules/
 dist/
-*.tsbuildinfo
+
+# Env files (machine-specific, may contain tunnel URLs / tokens)
+.env
+*.local
+
+# Python / backend
+__pycache__/
+*.pyc
+.venv/
+venv/
+backend/storage/
+*.egg-info/
+.pytest_cache/
