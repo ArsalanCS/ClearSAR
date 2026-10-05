@@ -1,8 +1,9 @@
 # Heavy deps for running the diffusion model in-process (INFERENCE_MODE=local).
 # Requires a CUDA GPU for reasonable latency (~3-5s on a T4; minutes on CPU).
 torch>=2.2
+torchvision           # Qwen2.5-VL fast image processor
 diffusers>=0.32.2
-transformers>=4.49.0
+transformers>=4.51.0   # Qwen2.5-VL scene description (DESCRIBE_MODE=vlm)
 accelerate>=1.4.0
 peft>=0.19.0
 safetensors>=0.4.5

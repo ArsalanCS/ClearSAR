@@ -22,13 +22,24 @@ for development and live demos; not for an always-on public service.
 ## Cell 1 — install dependencies
 ```python
 !pip install -q fastapi "uvicorn[standard]" python-multipart pydantic nest_asyncio \
-    diffusers transformers accelerate peft safetensors huggingface_hub pillow numpy
+    diffusers "transformers>=4.51" accelerate peft safetensors huggingface_hub pillow numpy scipy
 ```
 
-## Cell 2 — add the server file
-Click the **📁 Files** panel on the left ▸ **Upload** ▸ pick
-`backend/colab/clearsar_colab.py` from your machine.
-(You re-upload this once per fresh session.)
+## Cell 2 — add the server files
+Click the **📁 Files** panel on the left ▸ **Upload** ▸ pick **both**
+- `backend/colab/clearsar_colab.py` (API + bridge model)
+- `backend/model/sar_describe.py` (scene description: Qwen2.5-VL + measured SAR facts)
+
+(You re-upload these once per fresh session.)
+
+Optional — pick the description engine before Cell 3:
+```python
+import os
+os.environ["DESCRIBE_MODE"] = "vlm"                          # vlm (default) | facts | off
+os.environ["VLM_MODEL_ID"] = "Qwen/Qwen2.5-VL-3B-Instruct"   # fits a T4 next to the bridge
+```
+The 7B model (`Qwen/Qwen2.5-VL-7B-Instruct`) writes better descriptions but needs ~17 GB
+VRAM, so it only fits on an L4/A100 runtime, not a free T4.
 
 ## Cell 3 — start the server + public tunnel
 ```python
@@ -79,6 +90,20 @@ for _ in range(120):
 ```
 Watch the cell logs — the bridge model prints `[clearsar] bridge loaded (T=15, …)` once
 ready. ~3–5 s per image after warm-up.
+
+The scene description starts as soon as the optical image is saved. The first one downloads
+Qwen2.5-VL-3B (~7.5 GB, ~1–2 min) and prints `[clearsar] VLM ready`; wait for it too:
+```python
+for _ in range(300):
+    d = requests.get(f"http://localhost:8000/api/jobs/{jid}/description").json()
+    if d["status"] in ("completed", "failed"): break
+    time.sleep(2)
+print(d["engine"], d.get("fallback_reason")); print(d["text"])
+```
+`engine` should be `vlm`. If it says `facts`, the VLM failed to load (see `fallback_reason`)
+and the site shows the statistics-only description instead. After warm-up a description
+takes ~5–10 s on a T4; the UI shows the optical image straight away and fills the
+description in when it is ready.
 
 ---
 

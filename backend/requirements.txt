@@ -6,6 +6,7 @@ pydantic==2.10.4
 pydantic-settings==2.7.1
 pillow==11.1.0
 numpy==2.2.1
+scipy>=1.14  # SAR statistics for the scene description (model/sar_describe.py)
 
 # --- Local inference mode only (INFERENCE_MODE=local) ---
 # Heavy GPU deps. Install separately when running the model in-process:

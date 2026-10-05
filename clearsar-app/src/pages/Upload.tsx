@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react'
 import { PageId } from '../types'
-import { uploadScene, SEASONS, TERRAINS, Season, Terrain } from '../api'
+import { uploadScene, SEASONS, TERRAINS, PURPOSES, PURPOSE_LABELS, Season, Terrain, Purpose } from '../api'
 
 interface Props {
   onNavigate: (page: PageId) => void
@@ -13,20 +13,21 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [season, setSeason] = useState<Season>('summer')
   const [terrain, setTerrain] = useState<Terrain>('temperate')
+  const [purpose, setPurpose] = useState<Purpose>('general')
   const inputRef = useRef<HTMLInputElement>(null)
 
   const submit = useCallback(async (file: File) => {
     setBusy(true)
     setError(null)
     try {
-      const { job_id } = await uploadScene(file, season, terrain)
+      const { job_id } = await uploadScene(file, season, terrain, purpose)
       onJobCreated(job_id)
       onNavigate('processing')
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Upload failed')
       setBusy(false)
     }
-  }, [onJobCreated, onNavigate, season, terrain])
+  }, [onJobCreated, onNavigate, season, terrain, purpose])
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -87,6 +88,12 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
           Terrain
           <select className="cond-select" value={terrain} onChange={e => setTerrain(e.target.value as Terrain)}>
             {TERRAINS.map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+        </label>
+        <label className="cond-field" title="Audience of the scene description written after translation">
+          Description
+          <select className="cond-select" value={purpose} onChange={e => setPurpose(e.target.value as Purpose)}>
+            {PURPOSES.map(p => <option key={p} value={p}>{PURPOSE_LABELS[p]}</option>)}
           </select>
         </label>
         <span className="cond-preview">
@@ -172,8 +179,8 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
               <span className="mono">~25 s</span>
             </div>
             <div className="help-row">
-              <span>BLIP-2 caption</span>
-              <span className="mono">~5 s</span>
+              <span>VLM scene summary</span>
+              <span className="mono">~8 s</span>
             </div>
             <div className="help-row" style={{ color: 'var(--accent)' }}>
               <span><b>End-to-end</b></span>

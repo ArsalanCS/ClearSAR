@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import CompareSlider from '../components/ui/CompareSlider'
+import SceneDescription from '../components/ui/SceneDescription'
 import { PageId } from '../types'
 import { getResult, JobResult, apiUrl } from '../api'
 
@@ -138,6 +139,8 @@ export default function Results({ onNavigate, jobId }: Props) {
           </button>
         </div>
       </div>
+
+      {result && <SceneDescription jobId={jobId} filename={result.filename} />}
     </section>
   )
 }

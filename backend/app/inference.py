@@ -3,12 +3,16 @@ Dispatches a SAR image to an inference backend and returns an optical PIL image:
   mock  - synthetic placeholder (no torch, no GPU) for UI development
   local - loads the bridge diffusion model in-process via model/pipeline.py
 
+`describe` then writes the scene description from the SAR + translated optical
+(DESCRIBE_MODE: vlm / facts / off).
+
 For free GPU inference, run the self-contained server in backend/colab/ instead and
 point the frontend at its tunnel URL.
 """
 from __future__ import annotations
 
 import math
+from typing import Optional
 
 from PIL import Image
 
@@ -50,6 +54,25 @@ def _local_translate(image: Image.Image, season: str, terrain: str) -> Image.Ima
         hf_token=s.hf_token or None,
     )
     return pipe.translate(image, season=season, terrain=terrain)
+
+
+def bridge_steps() -> Optional[int]:
+    """Sampling steps of the loaded bridge model (None in mock mode / before first load)."""
+    if get_settings().inference_mode.lower() != "local":
+        return None
+    from model.pipeline import _PIPELINE
+    return _PIPELINE.T if _PIPELINE is not None and _PIPELINE._loaded else None
+
+
+def describe(sar_path, optical: Image.Image, purpose: str, terrain: str, season: str,
+             seed_key: str) -> dict:
+    """SAR -> optical scene description, run after translation (see model/sar_describe.py)."""
+    from model.sar_describe import describe_scene, seed_for
+
+    s = get_settings()
+    return describe_scene(sar_path, optical, purpose=purpose, terrain=terrain, season=season,
+                          mode=s.resolved_describe_mode, model_id=s.vlm_model_id,
+                          seed=seed_for(seed_key), max_new_tokens=s.describe_max_new_tokens)
 
 
 def translate(image: Image.Image, season: str = "summer", terrain: str = "temperate") -> Image.Image:

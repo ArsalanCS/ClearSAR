@@ -9,7 +9,10 @@ Port of the notebook's Stage-3 bridge (cell 28): 16ch adapted VAE (base SD vae +
 DetailEncoder), UNet conv_in 32ch / conv_out 16ch, CLIP text conditioning, and
 I2SB bridge sampling (T steps, kappa, eta schedule, latent_scale).
 
-See colab/README.md for the 3-cell recipe.
+After translation, a scene description is written by Qwen2.5-VL from the SAR + translated
+optical + measured SAR facts (sar_describe.py, uploaded next to this file).
+
+See colab/README.md for the recipe.
 """
 from __future__ import annotations
 
@@ -38,6 +41,15 @@ COND_SEASON = os.environ.get("COND_SEASON", "summer")
 COND_TERRAIN = os.environ.get("COND_TERRAIN", "temperate")
 STORAGE = Path(os.environ.get("STORAGE_DIR", "/content/clearsar_storage"))
 STORAGE.mkdir(parents=True, exist_ok=True)
+DESCRIBE_MODE = os.environ.get("DESCRIBE_MODE", "vlm")          # vlm | facts | off
+VLM_MODEL_ID = os.environ.get("VLM_MODEL_ID", "Qwen/Qwen2.5-VL-3B-Instruct")
+DESCRIBE_MAX_NEW_TOKENS = int(os.environ.get("DESCRIBE_MAX_NEW_TOKENS", "256"))
+PURPOSES = ("general", "defense", "flood")
+
+try:  # uploaded next to this file on Colab; package import when run from backend/
+    import sar_describe
+except ImportError:
+    from model import sar_describe
 
 METRICS = {"psnr": None, "ssim": None, "lpips": None}
 BASE_CH, DETAIL_CH, TOTAL_CH = 4, 12, 16
@@ -168,7 +180,27 @@ def _run(jid, raw, season, terrain):
              elapsed_s=round(time.time() - _jobs[jid]["started"], 2))
     except Exception as e:  # noqa: BLE001
         import traceback; traceback.print_exc()
-        _set(jid, status="failed", stage="ingest", progress=0, error=str(e))
+        _set(jid, status="failed", stage="ingest", progress=0, error=str(e), desc_status="off")
+        return
+    _describe(jid)
+
+
+def _describe(jid):
+    """Runs after the job is `completed`, so the optical image is viewable meanwhile."""
+    j = _jobs[jid]
+    if j["desc_status"] == "off":
+        return
+    _set(jid, desc_status="running", desc_error=None)
+    t0 = time.time()
+    try:
+        rec = sar_describe.describe_scene(
+            STORAGE / f"{jid}_sar.png", Image.open(STORAGE / f"{jid}_optical.png"),
+            purpose=j["purpose"], terrain=j["terrain"], season=j["season"], mode=DESCRIBE_MODE,
+            model_id=VLM_MODEL_ID, seed=sar_describe.seed_for(jid), max_new_tokens=DESCRIBE_MAX_NEW_TOKENS)
+        _set(jid, desc=rec, desc_status="completed", desc_elapsed_s=round(time.time() - t0, 2))
+    except Exception as e:  # noqa: BLE001
+        import traceback; traceback.print_exc()
+        _set(jid, desc_status="failed", desc_error=str(e))
 
 
 # ------------------------------------------------------------------ API
@@ -178,12 +210,16 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "mode": "colab-bridge", "model": f"{HF_MODEL_REPO}/{BRIDGE_DIR}"}
+    return {"status": "ok", "mode": "colab-bridge", "model": f"{HF_MODEL_REPO}/{BRIDGE_DIR}",
+            "describe_mode": DESCRIBE_MODE, "vlm": VLM_MODEL_ID if DESCRIBE_MODE == "vlm" else None}
 
 
 @app.post("/api/translate", status_code=202)
 async def translate(file: UploadFile = File(...),
-                    season: str = Form("summer"), terrain: str = Form("temperate")):
+                    season: str = Form("summer"), terrain: str = Form("temperate"),
+                    purpose: str = Form("general")):
+    if purpose not in PURPOSES:
+        raise HTTPException(422, f"purpose must be one of {list(PURPOSES)}")
     raw = await file.read()
     if not raw:
         raise HTTPException(400, "Empty file")
@@ -192,7 +228,9 @@ async def translate(file: UploadFile = File(...),
         _jobs[jid] = {"job_id": jid, "filename": file.filename or "scene", "status": "queued",
                       "stage": "ingest", "progress": 0.0, "error": None, "started": time.time(),
                       "created_at": datetime.now(timezone.utc).isoformat(), "elapsed_s": None,
-                      "season": season, "terrain": terrain}
+                      "season": season, "terrain": terrain, "purpose": purpose,
+                      "desc_status": "off" if DESCRIBE_MODE == "off" else "pending",
+                      "desc": None, "desc_error": None, "desc_elapsed_s": None}
     try:
         Image.open(io.BytesIO(raw)).convert("L").save(STORAGE / f"{jid}_sar.png")
     except Exception as e:  # noqa: BLE001
@@ -219,7 +257,47 @@ def result(jid: str):
     return {"job_id": jid, "status": "completed", "filename": j["filename"],
             "sar_url": f"/api/images/{jid}/sar", "optical_url": f"/api/images/{jid}/optical",
             "metrics": METRICS, "ddim_steps": bridge.T if bridge._loaded else None, "img_size": IMG_SIZE,
-            "created_at": j["created_at"], "elapsed_s": j["elapsed_s"]}
+            "created_at": j["created_at"], "elapsed_s": j["elapsed_s"],
+            "purpose": j["purpose"], "description_status": j["desc_status"]}
+
+
+_DESC_KEYS = ("engine", "vlm", "text", "sections", "reliability", "confidence", "warning",
+              "sar_facts", "retried", "truncated", "fallback_reason")
+
+
+def _description(j):
+    d = j["desc"] or {}
+    return {"job_id": j["job_id"], "status": j["desc_status"], "purpose": j["purpose"],
+            "error": j["desc_error"], "elapsed_s": j["desc_elapsed_s"],
+            "sections": [], "confidence": {}, "retried": False, "truncated": False,
+            **{k: d[k] for k in _DESC_KEYS if k in d}}
+
+
+@app.get("/api/jobs/{jid}/description")
+def description(jid: str):
+    j = _jobs.get(jid)
+    if not j:
+        raise HTTPException(404, "Job not found")
+    return _description(j)
+
+
+@app.post("/api/jobs/{jid}/description", status_code=202)
+def regenerate_description(jid: str, purpose: str = Form("general")):
+    j = _jobs.get(jid)
+    if not j:
+        raise HTTPException(404, "Job not found")
+    if purpose not in PURPOSES:
+        raise HTTPException(422, f"purpose must be one of {list(PURPOSES)}")
+    if j["status"] != "completed":
+        raise HTTPException(409, f"Job is {j['status']}")
+    if DESCRIBE_MODE == "off":
+        raise HTTPException(409, "Scene description is disabled (DESCRIBE_MODE=off)")
+    with _lock:
+        if j["desc_status"] in ("pending", "running"):
+            return _description(j)
+        j.update(purpose=purpose, desc_status="pending", desc=None)
+    threading.Thread(target=_describe, args=(jid,), daemon=True).start()
+    return _description(j)
 
 
 @app.get("/api/images/{jid}/{kind}")

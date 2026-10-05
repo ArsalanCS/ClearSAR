@@ -36,6 +36,33 @@ Set `INFERENCE_MODE` in `.env`:
 > through a tunnel. See [`colab/README.md`](colab/README.md). This is the recommended
 > path: the bridge UNet is 3.4 GB and needs a real GPU.
 
+## Scene description (after translation)
+
+Once the optical image is saved, [`model/sar_describe.py`](model/sar_describe.py) writes a
+short description of the scene: a 2–3 sentence **Summary** (≤ ~60 words) with only the crux,
+plus one **Reliability** sentence. Method ported from `sar_describe_v2.ipynb`:
+
+- The VLM (Qwen2.5-VL) sees **both** the despeckled SAR (Lee filter + contrast stretch)
+  and the translated optical image, plus **measured SAR facts**: 3×3 region brightness and
+  texture, dark smooth areas, extended bright areas, compact bright returns, and the
+  dominant linear direction. It also gets the season/terrain conditioning and the ground
+  scale (256 px = 2.56 km).
+- Every claim ends in a `[high]/[medium]/[low]` confidence tag. Decoding is sampled with a per-job seed, with one
+  retry if sections are missing or hedging dominates.
+- Purpose picks what the summary focuses on: `general`, `defense` (situational awareness)
+  or `flood`. The UI can regenerate with another purpose.
+- The job is `completed` as soon as the image is ready. The description runs after that
+  and is polled separately, so the viewer never waits on the VLM.
+
+`DESCRIBE_MODE` in `.env`:
+
+| mode    | what it does | needs |
+|---------|--------------|-------|
+| `auto`  | `vlm` when `INFERENCE_MODE=local`, else `facts` (default) | — |
+| `vlm`   | Qwen2.5-VL on SAR + optical + facts; falls back to `facts` if it fails | GPU + `requirements-local.txt` |
+| `facts` | text built from the measured SAR statistics only | nothing (scipy) |
+| `off`   | no description | — |
+
 ## Run it
 
 ```bash
@@ -63,9 +90,11 @@ T4-class GPU a translation is a few seconds; on CPU it's minutes.
 | method | path                          | purpose |
 |--------|-------------------------------|---------|
 | GET    | `/api/health`                 | mode + model info |
-| POST   | `/api/translate`              | multipart `file` + `season` + `terrain` → `{ job_id }` (202) |
+| POST   | `/api/translate`              | multipart `file` + `season` + `terrain` + `purpose` → `{ job_id }` (202) |
 | GET    | `/api/jobs/{id}`              | `{ status, stage, progress }` (poll this) |
-| GET    | `/api/jobs/{id}/result`       | optical/SAR URLs + metadata |
+| GET    | `/api/jobs/{id}/result`       | optical/SAR URLs + metadata + `description_status` |
+| GET    | `/api/jobs/{id}/description`  | `{ status, sections[{name, claims[{text, confidence}]}], reliability, sar_facts, … }` (poll until `completed`) |
+| POST   | `/api/jobs/{id}/description`  | form `purpose` → regenerate the description (202) |
 | GET    | `/api/images/{id}/{sar\|optical}` | PNG bytes |
 | GET    | `/api/scenes`                 | completed scenes (library) |
 

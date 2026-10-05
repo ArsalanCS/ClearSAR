@@ -18,6 +18,50 @@ class Stage(str, Enum):
     done = "done"
 
 
+class Purpose(str, Enum):
+    general = "general"
+    defense = "defense"
+    flood = "flood"
+
+
+class DescriptionStatus(str, Enum):
+    off = "off"
+    pending = "pending"
+    running = "running"
+    completed = "completed"
+    failed = "failed"
+
+
+class Claim(BaseModel):
+    text: str
+    confidence: Optional[str] = None   # high | medium | low
+
+
+class Section(BaseModel):
+    name: str
+    body: str
+    claims: list[Claim]
+
+
+class Description(BaseModel):
+    job_id: str
+    status: DescriptionStatus
+    purpose: Purpose
+    error: Optional[str] = None
+    engine: Optional[str] = None         # vlm | facts
+    vlm: Optional[str] = None
+    text: Optional[str] = None
+    sections: list[Section] = []
+    reliability: Optional[str] = None
+    confidence: dict[str, int] = {}
+    warning: Optional[str] = None
+    sar_facts: Optional[str] = None
+    retried: bool = False
+    truncated: bool = False
+    fallback_reason: Optional[str] = None
+    elapsed_s: Optional[float] = None
+
+
 class Metrics(BaseModel):
     psnr: Optional[float] = None
     ssim: Optional[float] = None
@@ -45,10 +89,12 @@ class JobResult(BaseModel):
     sar_url: str          # original SAR (grayscale) served back
     optical_url: str      # generated optical PNG
     metrics: Metrics
-    ddim_steps: int
+    ddim_steps: Optional[int] = None   # bridge sampling steps (T); None until the model is loaded
     img_size: int
     created_at: str
     elapsed_s: Optional[float] = None
+    purpose: Purpose = Purpose.general
+    description_status: DescriptionStatus = DescriptionStatus.off
 
 
 class SceneSummary(BaseModel):

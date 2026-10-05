@@ -3,9 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 from .config import get_settings
+from .inference import bridge_steps
 from .jobs import store, MODEL_METRICS
 from .schemas import (
     JobCreated, JobState, JobResult, SceneSummary, JobStatus, Metrics,
+    Description, DescriptionStatus, Purpose,
 )
 
 settings = get_settings()
@@ -25,7 +27,9 @@ MAX_BYTES = 50 * 1024 * 1024  # 50 MB, matches the upload-page spec
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "mode": settings.inference_mode, "model": settings.hf_model_repo}
+    return {"status": "ok", "mode": settings.inference_mode, "model": settings.hf_model_repo,
+            "describe_mode": settings.resolved_describe_mode,
+            "vlm": settings.vlm_model_id if settings.resolved_describe_mode == "vlm" else None}
 
 
 @app.post("/api/translate", response_model=JobCreated, status_code=202)
@@ -33,6 +37,7 @@ async def translate(
     file: UploadFile = File(...),
     season: str = Form("summer"),
     terrain: str = Form("temperate"),
+    purpose: Purpose = Form(Purpose.general),
 ):
     name = file.filename or "scene"
     ext = ("." + name.rsplit(".", 1)[-1].lower()) if "." in name else ""
@@ -45,7 +50,7 @@ async def translate(
     if len(raw) > MAX_BYTES:
         raise HTTPException(413, "File exceeds 50 MB limit")
 
-    job = store.create(name, raw, season, terrain)
+    job = store.create(name, raw, season, terrain, purpose.value)
     if job.status == JobStatus.failed:
         raise HTTPException(400, job.error or "Failed to ingest file")
     return JobCreated(job_id=job.job_id, status=job.status)
@@ -76,11 +81,43 @@ def job_result(job_id: str):
         sar_url=f"/api/images/{job.job_id}/sar",
         optical_url=f"/api/images/{job.job_id}/optical",
         metrics=MODEL_METRICS,
-        ddim_steps=settings.ddim_steps,
+        ddim_steps=bridge_steps(),
         img_size=settings.img_size,
         created_at=job.created_at,
         elapsed_s=job.elapsed_s,
+        purpose=job.purpose,
+        description_status=job.desc_status,
     )
+
+
+def _description(job) -> Description:
+    d = job.desc or {}
+    return Description(
+        job_id=job.job_id, status=job.desc_status, purpose=job.purpose, error=job.desc_error,
+        elapsed_s=job.desc_elapsed_s,
+        **{k: d[k] for k in ("engine", "vlm", "text", "sections", "reliability", "confidence", "warning",
+                             "sar_facts", "retried", "truncated", "fallback_reason") if k in d},
+    )
+
+
+@app.get("/api/jobs/{job_id}/description", response_model=Description)
+def job_description(job_id: str):
+    job = store.get(job_id)
+    if not job:
+        raise HTTPException(404, "Job not found")
+    return _description(job)
+
+
+@app.post("/api/jobs/{job_id}/description", response_model=Description, status_code=202)
+def regenerate_description(job_id: str, purpose: Purpose = Form(Purpose.general)):
+    job = store.get(job_id)
+    if not job:
+        raise HTTPException(404, "Job not found")
+    if job.status != JobStatus.completed:
+        raise HTTPException(409, f"Job is {job.status.value}, not completed")
+    if settings.resolved_describe_mode == "off":
+        raise HTTPException(409, "Scene description is disabled (DESCRIBE_MODE=off)")
+    return _description(store.redescribe(job_id, purpose.value))
 
 
 @app.get("/api/images/{job_id}/{kind}")
