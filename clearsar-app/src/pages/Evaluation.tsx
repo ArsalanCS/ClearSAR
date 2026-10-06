@@ -1,143 +1,190 @@
-const METRICS = [
-  { label: 'PSNR ↑',  ours: 22.4, base: 18.7, delta: '+3.7',  ousPct: 90, basePct: 70 },
-  { label: 'SSIM ↑',  ours: 0.63, base: 0.51, delta: '+0.12', ousPct: 63, basePct: 51 },
-  { label: 'LPIPS ↓', ours: 0.21, base: 0.32, delta: '−0.11', ousPct: 42, basePct: 64 },
-  { label: 'FID ↓',   ours: 31.2, base: 64.1, delta: '−32.9', ousPct: 31, basePct: 64 },
+import { PageId } from '../types'
+import {
+  HEADLINE, BRIDGE, BY_SEASON, BY_TERRAIN, MODEL_HISTORY, REGRESSOR_LINEAGE, SOTA_REF, Scores,
+  MODEL_NAME, MODEL_LABEL, MODEL_SUMMARY, RESULTS_URL, MODEL_URL, TRAIN_STEPS, UNET_PASSES, FIXED_TIMESTEP,
+} from '../evalResults'
+
+interface Props {
+  onNavigate: (page: PageId) => void
+}
+
+const sign = (n: number, d: number) => `${n >= 0 ? '+' : '−'}${Math.abs(n).toFixed(d)}`
+
+// Two stacked bars per row: PSNR (accent) and SSIM (grey), scaled to the published reference.
+function Rows({ rows }: { rows: { name: string; note?: string; s: Scores; current?: boolean }[] }) {
+  return (
+    <div className="bench-rows">
+      {rows.map(r => (
+        <div className="br" key={r.name}>
+          <div className="nm" style={r.current ? { color: 'var(--accent)' } : undefined}>
+            {r.name}
+            {r.note && <div className="eval-note">{r.note}</div>}
+          </div>
+          <div className="bars">
+            <div className="bar"><div className="fill us" style={{ width: `${(r.s.psnr / SOTA_REF.psnr) * 100}%` }} /></div>
+            <div className="bar"><div className="fill base" style={{ width: `${(r.s.ssim / SOTA_REF.ssim) * 100}%` }} /></div>
+          </div>
+          <div className="delta eval-val">
+            {r.s.psnr.toFixed(2)} dB
+            <span>{r.s.ssim.toFixed(3)}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+const Legend = () => (
+  <div className="chart-legend">
+    <div className="l"><span className="sw" style={{ background: 'var(--accent)' }} />PSNR (dB) ↑</div>
+    <div className="l"><span className="sw" style={{ background: 'var(--ink-3)' }} />SSIM ↑</div>
+  </div>
+)
+
+// metric, higher-is-better, decimals, unit
+const COMPARE: [keyof Scores, string, boolean, number, string][] = [
+  ['psnr', 'PSNR', true, 2, ' dB'],
+  ['ssim', 'SSIM', true, 3, ''],
+  ['cc', 'CC', true, 3, ''],
+  ['sam', 'SAM', false, 2, '°'],
+  ['lpips', 'LPIPS', false, 3, ''],
+  ['fid', 'FID', false, 1, ''],
 ]
 
-export default function Evaluation() {
+export default function Evaluation({ onNavigate }: Props) {
   return (
     <section className="page on" id="p-admin">
       <div className="ph">
         <div>
-          <h1>SD-v1.5-SAR-FT · v0.4.2</h1>
-          <p>Test set 2,040 scenes from SEN12MS holdout · Baseline Pix2Pix trained on identical split.</p>
+          <h1>{MODEL_LABEL} · model evaluation</h1>
+          <p>{MODEL_SUMMARY}. Scored on the held-out test set against the real optical images, alongside the bridge model on the same set.</p>
         </div>
         <div className="ph-aside">
           <span className="chip ok"><span className="d" />DEPLOYED</span>
-          <button className="btn ghost">Re-run eval</button>
-          <button className="btn primary">Export report</button>
+          <a className="btn ghost" href={RESULTS_URL} target="_blank" rel="noreferrer">eval results ↗</a>
+          <button className="btn primary" onClick={() => onNavigate('docs')}>Scene reports →</button>
         </div>
       </div>
 
-      {/* Model selector */}
       <div className="admin-head">
-        <div className="model-sel">
+        <a className="model-sel" href={MODEL_URL} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
           <span className="lbl">ACTIVE</span>
-          <b>SD-v1.5-SAR-FT v0.4.2</b>
-          <span style={{ color: 'var(--ink-3)' }}>▾</span>
-        </div>
-        <span className="chip">TRAIN · 150K</span>
-        <span className="chip">VAL · 15K</span>
-        <span className="chip">TEST · 2040</span>
-        <span className="chip hi">FINE-TUNE · EPOCH 20</span>
-        <div style={{ flex: 1 }} />
-        <span className="lbl">LAST EVAL · 2 H AGO</span>
+          <b>{MODEL_NAME}</b>
+          <span style={{ color: 'var(--ink-3)' }}>↗</span>
+        </a>
+        <span className="chip">{UNET_PASSES} UNET PASS · t = {FIXED_TIMESTEP}</span>
+        <span className="chip">TRAIN · {TRAIN_STEPS / 1000}K STEPS</span>
+        <span className="chip">16-CH LATENT · TUNED DECODER</span>
+        <span className="chip hi">DETERMINISTIC</span>
       </div>
 
-      {/* KPIs */}
       <div className="kpis">
         <div className="kpi">
           <div className="lbl">PSNR ↑</div>
-          <div className="v"><em>22.4</em></div>
-          <div className="d">▲ vs 18.7 pix2pix</div>
+          <div className="v"><em>{HEADLINE.psnr.toFixed(2)}</em> <small className="eval-unit">dB</small></div>
+          <div className="d">▲ {sign(HEADLINE.psnr - BRIDGE.psnr, 2)} dB vs bridge</div>
         </div>
         <div className="kpi">
           <div className="lbl">SSIM ↑</div>
-          <div className="v">0.63</div>
-          <div className="d">▲ vs 0.51</div>
+          <div className="v">{HEADLINE.ssim.toFixed(3)}</div>
+          <div className="d">▲ {sign(HEADLINE.ssim - BRIDGE.ssim, 3)} vs bridge</div>
         </div>
         <div className="kpi">
           <div className="lbl">LPIPS ↓</div>
-          <div className="v">0.21</div>
-          <div className="d" style={{ color: 'var(--accent-2)' }}>▼ vs 0.32</div>
+          <div className="v">{HEADLINE.lpips.toFixed(3)}</div>
+          <div className="d" style={{ color: 'var(--warn)' }}>{sign(HEADLINE.lpips - BRIDGE.lpips, 3)} vs bridge</div>
         </div>
         <div className="kpi">
           <div className="lbl">FID ↓</div>
-          <div className="v">31.2</div>
-          <div className="d" style={{ color: 'var(--accent-2)' }}>▼ vs 64.1</div>
+          <div className="v">{HEADLINE.fid!.toFixed(1)}</div>
+          <div className="d" style={{ color: 'var(--warn)' }}>{sign(HEADLINE.fid! - BRIDGE.fid!, 1)} vs bridge</div>
         </div>
       </div>
 
-      {/* Charts */}
-      <div className="admin-grid">
-        {/* PSNR trajectory chart */}
+      <div className="admin-grid eval-grid">
         <div className="chart-card">
-          <h4>PSNR trajectory · last 10 epochs</h4>
-          <div className="chart-legend">
-            <div className="l"><span className="sw" style={{ background: '#ff6a2c' }} />ClearSAR (ours)</div>
-            <div className="l"><span className="sw" style={{ background: '#5b6472' }} />Pix2Pix baseline</div>
-          </div>
-          <svg viewBox="0 0 400 220" style={{ width: '100%', height: 'auto' }}>
-            <defs>
-              <linearGradient id="psnr-grad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#ff6a2c" stopOpacity=".35"/>
-                <stop offset="100%" stopColor="#ff6a2c" stopOpacity="0"/>
-              </linearGradient>
-            </defs>
-            {/* Grid lines */}
-            <g stroke="#1e232d" strokeWidth="1">
-              <line x1="40" y1="30"  x2="390" y2="30"/>
-              <line x1="40" y1="90"  x2="390" y2="90"/>
-              <line x1="40" y1="150" x2="390" y2="150"/>
-              <line x1="40" y1="210" x2="390" y2="210"/>
-              <line x1="40" y1="30"  x2="40"  y2="210"/>
-            </g>
-            {/* Y-axis labels */}
-            <g fontFamily="JetBrains Mono" fontSize="9" fill="#5b6472">
-              <text x="8"  y="34">24</text>
-              <text x="8"  y="94">22</text>
-              <text x="8"  y="154">20</text>
-              <text x="8"  y="214">18</text>
-              <text x="40" y="225">E1</text>
-              <text x="215" y="225" textAnchor="middle">E5</text>
-              <text x="390" y="225" textAnchor="end">E10</text>
-            </g>
-            {/* Baseline */}
-            <polyline fill="none" stroke="#5b6472" strokeWidth="1.5" strokeDasharray="4 4"
-              points="40,190 75,182 110,175 145,170 180,166 215,163 250,161 285,160 320,160 355,159 390,159"/>
-            {/* Ours filled */}
-            <polyline fill="url(#psnr-grad)" stroke="none"
-              points="40,170 75,140 110,120 145,100 180,85 215,72 250,62 285,54 320,48 355,42 390,38 390,210 40,210"/>
-            {/* Ours line */}
-            <polyline fill="none" stroke="#ff6a2c" strokeWidth="2"
-              points="40,170 75,140 110,120 145,100 180,85 215,72 250,62 285,54 320,48 355,42 390,38"/>
-            {/* Endpoint */}
-            <circle cx="390" cy="38" r="4" fill="#ff6a2c"/>
-            <text x="390" y="32" textAnchor="end" fontFamily="JetBrains Mono" fontSize="10" fill="#ff6a2c">
-              22.4 dB
-            </text>
-          </svg>
+          <h4>{MODEL_LABEL} vs bridge · same test set</h4>
+          <table className="eval-table">
+            <thead><tr><th>Metric</th><th>{MODEL_LABEL}</th><th>Bridge (15 steps)</th><th>Δ</th></tr></thead>
+            <tbody>
+              {COMPARE.map(([k, name, higher, d, unit]) => {
+                const a = HEADLINE[k] as number, b = BRIDGE[k] as number
+                const better = higher ? a > b : a < b
+                return (
+                  <tr key={k}>
+                    <td>{name} {higher ? '↑' : '↓'}</td>
+                    <td className={better ? 'eval-win' : ''}>{a.toFixed(d)}{unit}</td>
+                    <td className={!better ? 'eval-win' : ''}>{b.toFixed(d)}{unit}</td>
+                    <td style={{ color: better ? 'var(--accent-2)' : 'var(--warn)' }}>{sign(a - b, d)}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+          <p className="eval-foot">
+            Green marks the better model per metric. The regressor wins every pixel- and colour-fidelity metric
+            (PSNR, SSIM, CC, SAM); the bridge wins the perceptual ones (LPIPS, FID).
+          </p>
         </div>
 
-        {/* Metric comparison bars */}
         <div className="chart-card">
-          <h4>Metric comparison · ours vs baseline</h4>
-          <div className="bench-rows">
-            {METRICS.map(m => (
-              <div className="br" key={m.label}>
-                <div className="nm">{m.label}</div>
-                <div className="bars">
-                  <div className="bar">
-                    <div className="fill us" style={{ width: `${m.ousPct}%` }} />
-                    <div className="lbl" style={{ position: 'absolute', right: 6, top: -2, fontFamily: 'JetBrains Mono', fontSize: 10, color: 'var(--ink)' }}>
-                      {m.ours}
-                    </div>
-                  </div>
-                  <div className="bar">
-                    <div className="fill base" style={{ width: `${m.basePct}%` }} />
-                    <div className="lbl" style={{ position: 'absolute', right: 6, top: -2, fontFamily: 'JetBrains Mono', fontSize: 10, color: 'var(--ink)' }}>
-                      {m.base}
-                    </div>
-                  </div>
-                </div>
-                <div className="delta">{m.delta}</div>
-              </div>
-            ))}
-          </div>
+          <h4>Regressor training lineage</h4>
+          <table className="eval-table">
+            <thead><tr><th>Version</th><th>Steps</th><th>PSNR ↑</th><th>SSIM ↑</th></tr></thead>
+            <tbody>
+              {REGRESSOR_LINEAGE.map(r => (
+                <tr key={r.name} className={r.name === 'v3' ? 'on' : ''}>
+                  <td>{r.name}{r.name === 'v3' && <span className="eval-tag">deployed</span>}
+                    <div className="eval-note">{r.note}</div></td>
+                  <td>{r.steps / 1000}k</td>
+                  <td>{r.s.psnr.toFixed(2)}</td>
+                  <td>{r.s.ssim.toFixed(3)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="eval-foot">Validation scores logged at the end of each run; each version is fine-tuned from the previous one.</p>
         </div>
       </div>
 
+      <div className="admin-grid eval-grid two">
+        <div className="chart-card">
+          <h4>By season · {MODEL_LABEL}</h4>
+          <Legend />
+          <Rows rows={BY_SEASON.map(r => ({ name: r.name, note: `bridge ${r.b.psnr.toFixed(2)} dB`, s: r.s }))} />
+        </div>
+        <div className="chart-card">
+          <h4>By terrain · {MODEL_LABEL}</h4>
+          <Legend />
+          <Rows rows={BY_TERRAIN.map(r => ({ name: r.name, note: `bridge ${r.b.psnr.toFixed(2)} dB`, s: r.s }))} />
+        </div>
+      </div>
+
+      <div className="admin-grid eval-grid">
+        <div className="chart-card">
+          <h4>Progress across approaches</h4>
+          <Legend />
+          <Rows rows={[...MODEL_HISTORY, { name: 'Reference', note: 'colour-supervised diffusion (published)', s: SOTA_REF }]} />
+          <p className="eval-foot">Phase A and ResShift scores come from the training notebook; bridge and regressor from the shared test-set evaluation. Bars are scaled to the published reference.</p>
+        </div>
+        <div className="chart-card eval-reading">
+          <h4>Reading these numbers</h4>
+          <p>
+            SAR records surface roughness and geometry, not colour, so SAR-to-optical translation is under-determined
+            and pixel metrics stay modest even for strong models. The deployed regressor predicts the optical latent in
+            a single deterministic pass. That makes it the most accurate model per pixel and in colour
+            ({sign(HEADLINE.psnr - BRIDGE.psnr, 2)} dB PSNR, {sign(HEADLINE.ssim - BRIDGE.ssim, 3)} SSIM over the bridge),
+            fast, and repeatable: the same scene always gives the same image.
+          </p>
+          <p>
+            The cost is texture. A regressor predicts the average of plausible images, so fine detail is smoother,
+            which is why LPIPS and FID favour the 15-step bridge. For decision support, where geometry and colour
+            fidelity matter more than photographic texture, the regressor is the better default; the bridge is still
+            available on the backend (MODEL_DIR=bridge_final). These scores describe the model in general; an uploaded
+            scene has no ground-truth optical image.
+          </p>
+        </div>
+      </div>
     </section>
   )
 }

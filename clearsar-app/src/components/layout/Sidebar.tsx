@@ -20,6 +20,7 @@ const NAV_ITEMS = [
     section: '// Research',
     items: [
       { id: 'admin' as PageId, label: 'Evaluation', shortcut: 'E', icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M3 17l5-5 4 4 4-6 5 7"/><path d="M3 20h18"/></svg>) },
+      { id: 'docs' as PageId, label: 'Docs & reports', shortcut: 'D', icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg>) },
     ],
   },
 ]
@@ -54,13 +55,6 @@ export default function Sidebar({ current, onNavigate }: Props) {
             ))}
           </div>
         ))}
-        <div className="nv disabled">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-            <path d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-          Docs
-          <span className="k">?</span>
-        </div>
       </nav>
 
     </aside>

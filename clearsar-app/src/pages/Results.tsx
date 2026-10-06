@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import CompareSlider from '../components/ui/CompareSlider'
 import SceneDescription from '../components/ui/SceneDescription'
 import { PageId } from '../types'
-import { getResult, JobResult, apiUrl } from '../api'
+import { getResult, JobResult, apiUrl, modelSummary } from '../api'
+import { downloadReport } from '../report'
 
 interface Props {
   onNavigate: (page: PageId) => void
@@ -15,6 +16,15 @@ export default function Results({ onNavigate, jobId }: Props) {
   const [activeTab, setActiveTab] = useState(0)
   const [result, setResult] = useState<JobResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [reporting, setReporting] = useState(false)
+
+  const report = async () => {
+    if (!jobId) return
+    setReporting(true)
+    try { await downloadReport(jobId) }
+    catch (e) { setError(e instanceof Error ? e.message : 'Could not build the report') }
+    finally { setReporting(false) }
+  }
 
   useEffect(() => {
     if (!jobId) return
@@ -45,17 +55,19 @@ export default function Results({ onNavigate, jobId }: Props) {
           <h1>Translation result</h1>
           {result && (
             <p>
-              {result.filename} · {result.img_size}²
-              {result.ddim_steps != null && ` · ${result.ddim_steps} bridge steps`}
+              {result.filename} · {result.img_size}² · {modelSummary(result)}
               {result.elapsed_s != null && ` · ${result.elapsed_s}s`}
             </p>
           )}
         </div>
         <div className="ph-aside">
           <span className="chip ok"><span className="d" />COMPLETED</span>
-          <a className="btn primary" href={optUrl} download={result ? `${result.filename}_optical.png` : undefined}>
+          <a className="btn" href={optUrl} download={result ? `${result.filename}_optical.png` : undefined}>
             Download PNG
           </a>
+          <button className="btn primary" onClick={report} disabled={!result || reporting}>
+            {reporting ? 'Building report…' : 'PDF report ↓'}
+          </button>
         </div>
       </div>
 
@@ -123,6 +135,14 @@ export default function Results({ onNavigate, jobId }: Props) {
           <div className="caption-block">
             <div className="lbl" style={{ marginBottom: 10 }}>// Export</div>
             <div className="act-col">
+              <button className="btn" onClick={report} disabled={!result || reporting}>
+                <span>{reporting ? 'Building report…' : 'Download PDF report'}</span>
+                <span className="mono">A4</span>
+              </button>
+              <button className="btn" onClick={() => onNavigate('docs')}>
+                <span>All reports</span>
+                <span className="mono">docs</span>
+              </button>
               <a className="btn" href={optUrl} download>
                 <span>Download Optical PNG</span>
                 <span className="mono">{result?.img_size ?? 256}²</span>

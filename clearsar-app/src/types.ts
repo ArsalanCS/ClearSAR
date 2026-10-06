@@ -1,4 +1,4 @@
-export type PageId = 'landing' | 'upload' | 'processing' | 'results' | 'dashboard' | 'admin'
+export type PageId = 'landing' | 'upload' | 'processing' | 'results' | 'dashboard' | 'admin' | 'docs'
 
 export interface NavItem {
   id: PageId

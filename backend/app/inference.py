@@ -45,7 +45,7 @@ def _local_translate(image: Image.Image, season: str, terrain: str) -> Image.Ima
     s = get_settings()
     pipe = get_pipeline(
         repo=s.hf_model_repo,
-        bridge_dir=s.bridge_dir,
+        model_dir=s.model_dir,
         vae_tag=s.vae_tag,
         base_sd_model=s.base_sd_model,
         img_size=s.img_size,
@@ -56,12 +56,20 @@ def _local_translate(image: Image.Image, season: str, terrain: str) -> Image.Ima
     return pipe.translate(image, season=season, terrain=terrain)
 
 
-def bridge_steps() -> Optional[int]:
-    """Sampling steps of the loaded bridge model (None in mock mode / before first load)."""
-    if get_settings().inference_mode.lower() != "local":
-        return None
+def model_info() -> dict:
+    """Active SAR->optical model: name, method, steps per image, dataset-level scores."""
+    from model.pipeline import model_card
+    s = get_settings()
+    info = {"name": s.model_dir, "repo": s.hf_model_repo, "method": None, "steps": None, **model_card(s.model_dir)}
+    if s.inference_mode.lower() == "mock":
+        info["method"] = "mock"
+        return info
     from model.pipeline import _PIPELINE
-    return _PIPELINE.T if _PIPELINE is not None and _PIPELINE._loaded else None
+    if _PIPELINE is not None and _PIPELINE._loaded:
+        info.update(method=_PIPELINE.method, steps=_PIPELINE.T)
+    elif s.model_dir.startswith("regressor"):
+        info.update(method="regressor", steps=1)
+    return info
 
 
 def describe(sar_path, optical: Image.Image, purpose: str, terrain: str, season: str,

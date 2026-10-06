@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
 import { PageId } from '../types'
 import { listScenes, SceneSummary, apiUrl } from '../api'
+import { downloadReport } from '../report'
 
 interface Props {
   onNavigate: (page: PageId) => void
   onOpenScene: (jobId: string) => void
+  query?: string
 }
 
-export default function Library({ onNavigate, onOpenScene }: Props) {
+export default function Library({ onNavigate, onOpenScene, query = '' }: Props) {
   const [scenes, setScenes] = useState<SceneSummary[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -25,6 +27,8 @@ export default function Library({ onNavigate, onOpenScene }: Props) {
   }
 
   const empty = scenes !== null && scenes.length === 0
+  const q = query.trim().toLowerCase()
+  const shown = (scenes ?? []).filter(s => !q || s.filename.toLowerCase().includes(q) || s.job_id.includes(q))
   const fmtDate = (iso: string) => {
     const d = new Date(iso)
     return isNaN(d.getTime()) ? iso : d.toLocaleString()
@@ -44,7 +48,7 @@ export default function Library({ onNavigate, onOpenScene }: Props) {
 
       {error && (
         <div style={{ border: '1px solid var(--danger)', color: 'var(--danger)', padding: '10px 14px', marginBottom: 16, fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>
-          ⚠ {error} — is the backend running on :8000?
+          ⚠ {error} — is the backend reachable?
         </div>
       )}
 
@@ -65,7 +69,10 @@ export default function Library({ onNavigate, onOpenScene }: Props) {
         </div>
       ) : (
         <div className="dash-grid">
-          {(scenes ?? []).map(scene => (
+          {scenes !== null && shown.length === 0 && (
+            <div style={{ color: 'var(--ink-3)', fontFamily: "'JetBrains Mono', monospace", fontSize: 11 }}>No scenes match “{query}”.</div>
+          )}
+          {shown.map(scene => (
             <div key={scene.job_id} className="card" onClick={() => openScene(scene.job_id)}>
               <div className="thumb">
                 <img
@@ -78,7 +85,11 @@ export default function Library({ onNavigate, onOpenScene }: Props) {
               <h5 style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{scene.filename}</h5>
               <div className="row">
                 <span>{fmtDate(scene.created_at)}</span>
-                <span>PSNR <b>{scene.metrics.psnr ?? '—'}</b></span>
+                <span
+                  style={{ cursor: 'pointer', color: 'var(--accent)' }}
+                  title="Download PDF report"
+                  onClick={e => { e.stopPropagation(); downloadReport(scene.job_id).catch(() => undefined) }}
+                >PDF ↓</span>
               </div>
             </div>
           ))}

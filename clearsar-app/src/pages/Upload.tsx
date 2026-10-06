@@ -55,10 +55,9 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
       <div className="ph">
         <div>
           <h1>Drop a SAR scene to begin.</h1>
-          <p>Giant target, minimal friction. Supports Sentinel-1, Capella, and ICEYE GeoTIFFs. Max 50 MB per file.</p>
+          <p>Single-band SAR backscatter (e.g. Sentinel-1 VV) as GeoTIFF, PNG or JPEG. Scenes are resized to 256 × 256. Max 50 MB per file.</p>
         </div>
         <div className="ph-aside">
-          <button className="btn ghost">Switch to batch</button>
           <button className="btn primary" onClick={openPicker} disabled={busy}>
             {busy ? 'Uploading…' : 'Translate →'}
           </button>
@@ -75,7 +74,7 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
         </div>
       )}
 
-      {/* Scene conditioning — drives the bridge model's text prompt */}
+      {/* Scene conditioning — drives the model's CLIP text prompt */}
       <div className="cond-bar">
         <span className="cond-label">// Scene conditioning</span>
         <label className="cond-field">
@@ -127,9 +126,9 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
           <h3>{busy ? 'Uploading…' : 'Drop SAR file here'}</h3>
           <div className="sub">or click to browse</div>
           <div className="specs">
-            <span className="chip"><span className="d" />GEOTIFF</span>
-            <span className="chip">VV + VH</span>
-            <span className="chip">≥ 256²</span>
+            <span className="chip"><span className="d" />TIFF · PNG · JPG</span>
+            <span className="chip">SINGLE BAND</span>
+            <span className="chip">→ 256²</span>
             <span className="chip">≤ 50 MB</span>
           </div>
           <button
@@ -145,23 +144,23 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
             <h4>File requirements</h4>
             <div className="help-row">
               <span>Format</span>
-              <span className="mono">.tif / .tiff</span>
+              <span className="mono">.tif / .png / .jpg</span>
             </div>
             <div className="help-row">
-              <span>Min resolution</span>
-              <span className="mono">256 × 256</span>
+              <span>Resolution</span>
+              <span className="mono">resized to 256²</span>
             </div>
             <div className="help-row">
-              <span>Polarization</span>
-              <span className="mono">VV + VH</span>
+              <span>Bands</span>
+              <span className="mono">single (VV)</span>
             </div>
             <div className="help-row">
               <span>Max size</span>
               <span className="mono">50 MB</span>
             </div>
             <div className="help-row">
-              <span>Projection</span>
-              <span className="mono">EPSG:4326</span>
+              <span>Ground scale</span>
+              <span className="mono">10 m / px</span>
             </div>
           </div>
 
@@ -169,14 +168,14 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
             className="panel-card"
             style={{ background: 'linear-gradient(135deg, rgba(255,106,44,.08), var(--panel))', borderColor: 'var(--line-2)' }}
           >
-            <h4 style={{ color: 'var(--accent)' }}>// Processing SLA</h4>
+            <h4 style={{ color: 'var(--accent)' }}>// Processing time · Colab T4</h4>
             <div className="help-row">
               <span>Preprocess</span>
               <span className="mono">~1 s</span>
             </div>
             <div className="help-row">
-              <span>Diffusion (50 steps)</span>
-              <span className="mono">~25 s</span>
+              <span>Regressor (1 UNet pass)</span>
+              <span className="mono">&lt;1 s</span>
             </div>
             <div className="help-row">
               <span>VLM scene summary</span>
@@ -184,7 +183,7 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
             </div>
             <div className="help-row" style={{ color: 'var(--accent)' }}>
               <span><b>End-to-end</b></span>
-              <span className="mono">&lt; 40 s</span>
+              <span className="mono">~10 s</span>
             </div>
           </div>
         </div>

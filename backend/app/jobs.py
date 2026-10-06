@@ -23,10 +23,13 @@ from .config import get_settings
 from .inference import translate, describe
 from .schemas import JobStatus, Stage, Metrics, DescriptionStatus
 
-# Static eval-set metrics from the model card (eval_results/results.json, 256px).
-# These describe the model, not a per-image score (real per-image metrics need a
-# ground-truth optical pair, which a live SAR upload does not have).
-MODEL_METRICS = Metrics(psnr=16.66, ssim=0.256, lpips=0.769)
+
+def model_metrics() -> Metrics:
+    """Dataset-level scores of the configured model (model/pipeline.py MODEL_CARDS). They
+    describe the model, not a per-image score: a live SAR upload has no ground-truth optical pair."""
+    from model.pipeline import model_card
+    c = model_card(get_settings().model_dir)
+    return Metrics(psnr=c.get("psnr"), ssim=c.get("ssim"), lpips=c.get("lpips"))
 
 
 @dataclass

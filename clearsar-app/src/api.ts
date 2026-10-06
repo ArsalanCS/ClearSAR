@@ -32,6 +32,29 @@ export interface JobResult {
   elapsed_s: number | null
   purpose: Purpose
   description_status: DescriptionStatus
+  season?: string | null
+  terrain?: string | null
+  model?: ModelInfo | null      // older servers omit it
+}
+
+export interface ModelInfo {
+  name: string                  // checkpoint folder, e.g. regressor_v3_final
+  repo: string
+  method: 'regressor' | 'bridge' | 'mock' | null
+  steps: number | null          // UNet passes per image
+  label?: string | null
+  fid?: number | null
+  sam?: number | null
+  cc?: number | null
+}
+
+export function modelSummary(r: Pick<JobResult, 'model' | 'ddim_steps'>): string {
+  const m = r.model
+  if (!m) return r.ddim_steps != null ? `${r.ddim_steps} steps` : 'SAR->optical model'
+  const steps = m.steps ?? r.ddim_steps
+  const how = m.method === 'regressor' ? `one-step regressor` : m.method === 'bridge' ? `${steps ?? 15}-step bridge`
+    : m.method === 'mock' ? 'mock (no model)' : null
+  return how ? `${m.name} · ${how}` : m.name
 }
 
 export type DescriptionStatus = 'off' | 'pending' | 'running' | 'completed' | 'failed'
@@ -62,9 +85,13 @@ export interface SceneDescription {
 export interface SceneSummary {
   job_id: string
   filename: string
+  sar_url?: string            // older servers omit it; fall back to /api/images/{id}/sar
   optical_url: string
   created_at: string
   metrics: Metrics
+  season?: string | null
+  terrain?: string | null
+  description_status?: DescriptionStatus
 }
 
 async function jsonOrThrow<T>(res: Response): Promise<T> {

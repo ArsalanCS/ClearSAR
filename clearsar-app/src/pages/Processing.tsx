@@ -13,15 +13,15 @@ const CIRC = 2 * Math.PI * 140
 const STAGE_ORDER: Stage[] = ['ingest', 'encode', 'denoise', 'decode', 'done']
 const STAGE_LABELS: { stage: Stage; label: string; time: string }[] = [
   { stage: 'ingest',  label: '01 · INGEST',  time: 'validate' },
-  { stage: 'encode',  label: '02 · ENCODE',  time: 'VAE enc' },
-  { stage: 'denoise', label: '03 · DENOISE', time: '50 steps' },
+  { stage: 'encode',  label: '02 · ENCODE',  time: '16-ch VAE' },
+  { stage: 'denoise', label: '03 · TRANSLATE', time: 'UNet' },
   { stage: 'decode',  label: '04 · DECODE',  time: 'VAE dec' },
   { stage: 'done',    label: '05 · OUTPUT',  time: 'PNG' },
 ]
 const STAGE_TITLE: Record<Stage, string> = {
   ingest: 'Ingest & validate',
-  encode: 'VAE latent encode',
-  denoise: 'Latent diffusion · DDIM denoise',
+  encode: 'Adapted 16-ch VAE encode',
+  denoise: 'Latent translation (UNet)',
   decode: 'VAE decode → optical RGB',
   done: 'Finalizing',
 }
@@ -81,7 +81,7 @@ export default function Processing({ onNavigate, onComplete, jobId }: Props) {
           <h1>{error ? 'Translation failed' : 'Translating scene…'}</h1>
           <p>{error
             ? 'The backend reported an error during inference.'
-            : 'Latent diffusion inference in progress. Results appear in Scene Viewer on completion.'}</p>
+            : 'SAR-to-optical inference in progress. The scene summary and PDF report follow on the results page.'}</p>
         </div>
         <div className="ph-aside">
           <button className="btn ghost" onClick={() => onNavigate('upload')}>Cancel</button>

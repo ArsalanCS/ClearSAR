@@ -57,25 +57,25 @@ export default function Landing({ onNavigate }: Props) {
                 <path d="M5 12h14M13 6l6 6-6 6"/>
               </svg>
             </button>
-            <button className="btn">Request Briefing</button>
-            <button className="btn ghost">Watch 60s Demo</button>
+            <button className="btn" onClick={() => onNavigate('docs')}>Sample reports</button>
+            <button className="btn ghost" onClick={() => onNavigate('admin')}>Model evaluation</button>
           </div>
           <div className="landing-metrics">
             <div className="m">
-              <div className="v"><em>22.4</em> dB</div>
+              <div className="v"><em>18.3</em> dB</div>
               <div className="lbl">PSNR · test</div>
             </div>
             <div className="m">
-              <div className="v">0.63</div>
+              <div className="v">0.306</div>
               <div className="lbl">SSIM</div>
             </div>
             <div className="m">
-              <div className="v">&lt;40s</div>
-              <div className="lbl">latency</div>
+              <div className="v">~10s</div>
+              <div className="lbl">image + summary</div>
             </div>
             <div className="m">
-              <div className="v">180k</div>
-              <div className="lbl">train pairs</div>
+              <div className="v">1</div>
+              <div className="lbl">UNet pass</div>
             </div>
           </div>
         </div>
@@ -83,7 +83,7 @@ export default function Landing({ onNavigate }: Props) {
         <div className="landing-right">
           <RadarSVG />
           <div className="radar-tags">
-            <div className="t" style={{ left: '32%', top: '30%' }}>AOI · vessel 12m</div>
+            <div className="t" style={{ left: '32%', top: '30%' }}>AOI · water body</div>
             <div className="t" style={{ right: '18%', top: '37%' }}>structure · concrete</div>
             <div className="t" style={{ left: '30%', bottom: '30%' }}>vegetation dense</div>
           </div>
@@ -101,22 +101,22 @@ export default function Landing({ onNavigate }: Props) {
             <div className="cap">
               <div className="lbl hi">// Translate</div>
               <h3>SAR → Optical</h3>
-              <p>Fine-tuned Latent Diffusion (SD v1.5) converts raw radar backscatter to analysis-ready optical imagery in under 30 seconds.</p>
+              <p>A one-step regressor, distilled from a Schrödinger bridge on an adapted 16-channel SD-1.5 latent, turns radar backscatter into an optical estimate in a single deterministic pass.</p>
             </div>
             <div className="cap">
               <div className="lbl hi">// Describe</div>
-              <h3>Automated captions</h3>
-              <p>BLIP-2 vision-language model generates natural-language scene descriptions so non-experts can act on intelligence.</p>
+              <h3>Scene summaries</h3>
+              <p>Qwen2.5-VL reads the SAR, the translation and measured radar statistics, then writes a short summary with a confidence tag on every claim.</p>
             </div>
             <div className="cap">
               <div className="lbl hi">// Measure</div>
               <h3>Quantified quality</h3>
-              <p>PSNR, SSIM, LPIPS, FID — every translation is scored against ground truth and compared to Pix2Pix baseline.</p>
+              <p>PSNR, SSIM, LPIPS, FID, SAM and CC on a held-out test set, broken down by season and terrain and compared with the bridge and earlier approaches.</p>
             </div>
             <div className="cap">
               <div className="lbl hi">// Deploy</div>
-              <h3>Production web</h3>
-              <p>React + FastAPI, containerized, GPU-accelerated. Drag, drop, download — or integrate via REST.</p>
+              <h3>Reports</h3>
+              <p>React + FastAPI on a GPU backend. Drag and drop a scene, then download a PDF report with both images and the description — or integrate via REST.</p>
             </div>
           </div>
         </div>
@@ -165,32 +165,32 @@ export default function Landing({ onNavigate }: Props) {
             <div className="pstep">
               <div className="pn">01</div>
               <h4>Ingest</h4>
-              <p>GeoTIFF upload, validate format, projection, polarization.</p>
-              <span className="mono">~1.2 s</span>
+              <p>Upload single-band SAR (TIFF, PNG or JPEG) and validate it.</p>
+              <span className="mono">~1 s</span>
             </div>
             <div className="pstep">
               <div className="pn">02</div>
               <h4>Encode</h4>
-              <p>Convert to dB, normalize, tile to 256². VAE latent encoding.</p>
-              <span className="mono">~0.4 s</span>
+              <p>Resize to 256², encode into the adapted 16-channel VAE latent.</p>
+              <span className="mono">&lt;1 s</span>
             </div>
             <div className="pstep">
               <div className="pn">03</div>
-              <h4>Denoise</h4>
-              <p>50-step latent diffusion guided by SAR conditioning.</p>
-              <span className="mono">~25 s</span>
+              <h4>Translate</h4>
+              <p>One deterministic UNet pass predicts the optical latent, guided by season and terrain text.</p>
+              <span className="mono">&lt;1 s</span>
             </div>
             <div className="pstep">
               <div className="pn">04</div>
               <h4>Decode</h4>
-              <p>VAE decoder reconstructs RGB. Color-grade pass.</p>
-              <span className="mono">~0.3 s</span>
+              <p>The fine-tuned 16-channel VAE decoder reconstructs the optical RGB image.</p>
+              <span className="mono">&lt;1 s</span>
             </div>
             <div className="pstep">
               <div className="pn">05</div>
-              <h4>Caption</h4>
-              <p>BLIP-2 generates 10-50 word scene description with tags.</p>
-              <span className="mono">~5 s</span>
+              <h4>Describe</h4>
+              <p>Qwen2.5-VL writes a confidence-tagged summary; the PDF report is ready.</p>
+              <span className="mono">~8 s</span>
             </div>
           </div>
         </div>
@@ -206,27 +206,27 @@ export default function Landing({ onNavigate }: Props) {
           <div className="perf-grid">
             <div className="perf">
               <div className="lbl">PSNR ↑</div>
-              <div className="pv">22.4 <small>dB</small></div>
-              <div className="pd">vs 18.7 Pix2Pix · <b>+3.7</b></div>
+              <div className="pv">18.32 <small>dB</small></div>
+              <div className="pd">vs 16.69 bridge · <b>+1.64</b></div>
             </div>
             <div className="perf">
               <div className="lbl">SSIM ↑</div>
-              <div className="pv">0.63</div>
-              <div className="pd">vs 0.51 Pix2Pix · <b>+0.12</b></div>
+              <div className="pv">0.306</div>
+              <div className="pd">vs 0.257 bridge · <b>+0.048</b></div>
+            </div>
+            <div className="perf">
+              <div className="lbl">SAM ↓</div>
+              <div className="pv">6.27<small>°</small></div>
+              <div className="pd">vs 7.59° bridge · <b>−1.32°</b></div>
             </div>
             <div className="perf">
               <div className="lbl">LPIPS ↓</div>
-              <div className="pv">0.21</div>
-              <div className="pd">vs 0.32 Pix2Pix · <b>−0.11</b></div>
-            </div>
-            <div className="perf">
-              <div className="lbl">FID ↓</div>
-              <div className="pv">31.2</div>
-              <div className="pd">vs 64.1 Pix2Pix · <b>−32.9</b></div>
+              <div className="pv">0.823</div>
+              <div className="pd">vs 0.768 bridge · <b style={{ color: 'var(--warn)' }}>+0.056</b></div>
             </div>
           </div>
           <p className="perf-note">
-            Evaluated on 2,040-scene holdout from SEN12MS · Sentinel-1 VV+VH · trained on 150K paired patches.
+            Regressor v3 and the 15-step bridge on the same held-out test set at 256 px. The regressor is more faithful per pixel and in colour; the bridge keeps finer texture (LPIPS, FID). Full breakdown on the Evaluation page.
           </p>
         </div>
       </section>
@@ -238,14 +238,14 @@ export default function Landing({ onNavigate }: Props) {
             <div className="num">§ 05 / ENGAGE</div>
             <h2>Ready when you need ground truth.</h2>
             <p>
-              Upload your first SAR scene and receive an analyzed, captioned optical
-              translation in under 40 seconds.
+              Upload your first SAR scene and get an optical translation, a scene
+              summary and a downloadable PDF report in about 10 seconds.
             </p>
             <div className="actions">
               <button className="btn primary" onClick={() => onNavigate('upload')}>
                 Launch Console →
               </button>
-              <button className="btn ghost">Contact the team</button>
+              <button className="btn ghost" onClick={() => onNavigate('docs')}>Read the docs</button>
             </div>
           </div>
           <div className="team-card">

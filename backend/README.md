@@ -1,24 +1,36 @@
 # ClearSAR Backend
 
 FastAPI service that turns a SAR scene into an optical image using the
-**`bridge_final`** model from
-[`Arsalan90/sar-to-optical-diffusion`](https://huggingface.co/Arsalan90/sar-to-optical-diffusion).
+**`regressor_v3_final`** model from
+[`AliMusaRizvi/sar-to-optical-diffusion`](https://huggingface.co/AliMusaRizvi/sar-to-optical-diffusion/tree/main/regressor_v3_final),
+then writes a scene description.
 
 It drives the React frontend's **upload → processing → results** flow with an async
 job pattern (upload returns a `job_id`; the UI polls progress; the result is the
 generated optical PNG).
 
-## Model: Image-to-Image Schrödinger Bridge
+## Model
 
-Port of the notebook's Stage-3 bridge (`SAR_to_Optic_3.ipynb`):
+Both checkpoint families share one architecture on the adapted 16-channel latent:
 
 - **16-channel adapted VAE** — base SD-1.5 VAE + a `DetailEncoder` (3→12ch); the
-  latent is `concat[post_quant_conv(base)[4ch], detail(x)[12ch]]`, decoder widened to 16ch.
-  Weights: `adapted16_final/{base_vae.pth, detail_encoder.pth}`.
-- **UNet** — `conv_in` widened to 32ch (noisy latent ⊕ SAR latent), `conv_out` → 16ch.
-  Full fine-tuned weights: `bridge_final/unet.safetensors`.
+  latent is `concat[post_quant_conv(base)[4ch], detail(x)[12ch]] * latent_scale`, decoder
+  widened to 16ch. Detail encoder: `adapted16_final/detail_encoder.pth`.
+- **UNet** — `conv_in` widened to 32ch (state ⊕ SAR latent), `conv_out` → 16ch, fully
+  fine-tuned (`<MODEL_DIR>/unet.safetensors`).
 - **CLIP text conditioning** — `"a {season} satellite optical image of {terrain} terrain"`.
-- **Bridge sampling** — `T`, `kappa`, `eta` schedule, `latent_scale` from `bridge_config.json`.
+
+The method is read from `<MODEL_DIR>/bridge_config.json`:
+
+| `MODEL_DIR` | method | per image | decoder |
+|---|---|---|---|
+| `regressor_v3_final` (default) | deterministic regressor: `unet([y, y], t=933)` | 1 UNet pass | fine-tuned (`base_vae_tuned.pth`) |
+| `bridge_final` | I2SB bridge sampling (`T`, `kappa`, `eta`) | 15 UNet passes | `adapted16_final/base_vae.pth` |
+
+On the same test set the regressor scores PSNR 18.32 / SSIM 0.306 / LPIPS 0.823 / FID 215.5
+against the bridge's 16.69 / 0.257 / 0.768 / 128.1: more accurate per pixel and in colour,
+smoother texture. The UNet and VAE are built from their config files and loaded strictly
+from the checkpoint, so the base SD-1.5 UNet/VAE weights (~3.7 GB) are never downloaded.
 
 The recipe lives once in [`model/pipeline.py`](model/pipeline.py).
 
@@ -34,7 +46,7 @@ Set `INFERENCE_MODE` in `.env`:
 > For **free GPU** inference, use the self-contained server in
 > [`colab/`](colab/) — it runs the same model on a Colab GPU and exposes the same API
 > through a tunnel. See [`colab/README.md`](colab/README.md). This is the recommended
-> path: the bridge UNet is 3.4 GB and needs a real GPU.
+> path: the UNet is 3.4 GB and needs a real GPU.
 
 ## Scene description (after translation)
 
@@ -82,8 +94,9 @@ the full end-to-end UX immediately, no GPU required.
 pip install -r requirements-local.txt    # torch, diffusers, transformers, ...
 # set INFERENCE_MODE=local in .env
 ```
-First request downloads the adapted VAE + 3.4 GB bridge UNet + base SD-1.5. On a
-T4-class GPU a translation is a few seconds; on CPU it's minutes.
+First request downloads the 3.4 GB UNet, the tuned decoder, the detail encoder and the
+CLIP text encoder. On a T4-class GPU a regressor translation is well under a second
+(the bridge takes a few seconds); on CPU it's tens of seconds.
 
 ## API
 
@@ -96,10 +109,12 @@ T4-class GPU a translation is a few seconds; on CPU it's minutes.
 | GET    | `/api/jobs/{id}/description`  | `{ status, sections[{name, claims[{text, confidence}]}], reliability, sar_facts, … }` (poll until `completed`) |
 | POST   | `/api/jobs/{id}/description`  | form `purpose` → regenerate the description (202) |
 | GET    | `/api/images/{id}/{sar\|optical}` | PNG bytes |
-| GET    | `/api/scenes`                 | completed scenes (library) |
+| GET    | `/api/scenes`                 | completed scenes (library + reports), with season/terrain and `description_status` |
 
 ## Notes
 
 - Jobs and the loaded model live in process memory → run a **single** uvicorn worker.
 - The training data was image pairs (grayscale SAR ↔ RGB optical), so the backend
   accepts `.png/.jpg` as well as `.tif/.tiff`.
+- PDF scene reports are built in the browser (`clearsar-app/src/report.ts`, jsPDF) from
+  `/result`, `/description` and the two images, so neither server needs a PDF dependency.

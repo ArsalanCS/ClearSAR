@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 from .config import get_settings
-from .inference import bridge_steps
-from .jobs import store, MODEL_METRICS
+from .inference import model_info
+from .jobs import store, model_metrics
 from .schemas import (
     JobCreated, JobState, JobResult, SceneSummary, JobStatus, Metrics,
     Description, DescriptionStatus, Purpose,
@@ -27,7 +27,7 @@ MAX_BYTES = 50 * 1024 * 1024  # 50 MB, matches the upload-page spec
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "mode": settings.inference_mode, "model": settings.hf_model_repo,
+    return {"status": "ok", "mode": settings.inference_mode, "model": f"{settings.hf_model_repo}/{settings.model_dir}",
             "describe_mode": settings.resolved_describe_mode,
             "vlm": settings.vlm_model_id if settings.resolved_describe_mode == "vlm" else None}
 
@@ -74,19 +74,23 @@ def job_result(job_id: str):
         raise HTTPException(404, "Job not found")
     if job.status != JobStatus.completed:
         raise HTTPException(409, f"Job is {job.status.value}, not completed")
+    info = model_info()
     return JobResult(
         job_id=job.job_id,
         status=job.status,
         filename=job.filename,
         sar_url=f"/api/images/{job.job_id}/sar",
         optical_url=f"/api/images/{job.job_id}/optical",
-        metrics=MODEL_METRICS,
-        ddim_steps=bridge_steps(),
+        metrics=model_metrics(),
+        ddim_steps=info["steps"],
+        model=info,
         img_size=settings.img_size,
         created_at=job.created_at,
         elapsed_s=job.elapsed_s,
         purpose=job.purpose,
         description_status=job.desc_status,
+        season=job.season,
+        terrain=job.terrain,
     )
 
 
@@ -134,9 +138,13 @@ def scenes():
         SceneSummary(
             job_id=j.job_id,
             filename=j.filename,
+            sar_url=f"/api/images/{j.job_id}/sar",
             optical_url=f"/api/images/{j.job_id}/optical",
             created_at=j.created_at,
-            metrics=MODEL_METRICS,
+            metrics=model_metrics(),
+            season=j.season,
+            terrain=j.terrain,
+            description_status=j.desc_status,
         )
         for j in store.list()
     ]

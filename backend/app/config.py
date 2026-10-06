@@ -1,4 +1,5 @@
 from functools import lru_cache
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -8,10 +9,13 @@ class Settings(BaseSettings):
     # Inference backend: "mock" | "local"
     inference_mode: str = "mock"
 
-    # Shared model settings (bridge / I2SB model)
-    hf_model_repo: str = "Arsalan90/sar-to-optical-diffusion"
-    bridge_dir: str = "bridge_final"      # holds unet.safetensors + bridge_config.json
-    vae_tag: str = "adapted16_final"      # holds base_vae.pth + detail_encoder.pth
+    # SAR -> optical model (model/pipeline.py). The folder's bridge_config.json decides the
+    # method: deterministic regressor (one UNet pass) or I2SB bridge (T-step sampling).
+    hf_model_repo: str = "AliMusaRizvi/sar-to-optical-diffusion"
+    # holds unet.safetensors + bridge_config.json (+ base_vae_tuned.pth for regressor_v3).
+    # BRIDGE_DIR is accepted for older .env files.
+    model_dir: str = Field("regressor_v3_final", validation_alias=AliasChoices("MODEL_DIR", "BRIDGE_DIR", "model_dir"))
+    vae_tag: str = "adapted16_final"      # holds detail_encoder.pth (+ base_vae.pth fallback)
     base_sd_model: str = "stable-diffusion-v1-5/stable-diffusion-v1-5"
     img_size: int = 256
     # Default scene conditioning prompt (model was trained on season+terrain text).
