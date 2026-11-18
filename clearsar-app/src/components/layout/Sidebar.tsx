@@ -28,16 +28,7 @@ const NAV_ITEMS = [
 export default function Sidebar({ current, onNavigate }: Props) {
   return (
     <aside className="sidebar">
-      <div className="brand">
-        <svg viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" stroke="#1d4ed8" strokeWidth="1.2"/>
-          <circle cx="12" cy="12" r="5" stroke="#1d4ed8" strokeWidth="1.2"/>
-          <circle cx="12" cy="12" r="1.5" fill="#1d4ed8"/>
-          <line x1="2" y1="12" x2="22" y2="12" stroke="#1d4ed8" strokeWidth=".6" strokeDasharray="1 2"/>
-          <line x1="12" y1="2" x2="12" y2="22" stroke="#1d4ed8" strokeWidth=".6" strokeDasharray="1 2"/>
-        </svg>
-        ClearSAR
-      </div>
+      <div className="brand"><img src="/logo.png" alt="ClearSAR — Radar to Reality" className="brand-logo" /></div>
 
       <nav>
         {NAV_ITEMS.map(group => (

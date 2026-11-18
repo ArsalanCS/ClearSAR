@@ -103,7 +103,7 @@ export default function CompareSlider({ idleAnimate = true, sarUrl, optUrl }: Pr
           <circle cx="35" cy="35" r="14"/>
           <line x1="0" y1="35" x2="70" y2="35"/>
           <line x1="35" y1="0" x2="35" y2="70"/>
-          <circle cx="35" cy="35" r="2" fill="#1d4ed8" stroke="none"/>
+          <circle cx="35" cy="35" r="2" fill="#1e3a8a" stroke="none"/>
         </svg>
         <div className="handle" style={{ left: `${pct}%` }} />
       </div>

@@ -94,7 +94,7 @@ export default function Processing({ onNavigate, onComplete, jobId }: Props) {
             <circle cx="160" cy="160" r="140" fill="none" stroke="#e2e8f0" strokeWidth="3"/>
             <circle
               cx="160" cy="160" r="140"
-              fill="none" stroke={error ? '#dc2626' : '#1d4ed8'} strokeWidth="3"
+              fill="none" stroke={error ? '#dc2626' : '#1e3a8a'} strokeWidth="3"
               strokeLinecap="round"
               strokeDasharray={dashArray}
               style={{ transition: 'stroke-dasharray .4s' }}

@@ -166,7 +166,7 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
 
           <div
             className="panel-card"
-            style={{ background: 'linear-gradient(135deg, rgba(29,78,216,.08), var(--panel))', borderColor: 'var(--line-2)' }}
+            style={{ background: 'linear-gradient(135deg, rgba(30,58,138,.08), var(--panel))', borderColor: 'var(--line-2)' }}
           >
             <h4 style={{ color: 'var(--accent)' }}>Processing time · Colab T4</h4>
             <div className="help-row">
