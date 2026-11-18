@@ -138,7 +138,7 @@ export default function Docs({ onNavigate, onOpenScene, query = '' }: Props) {
 
           <div className="docs-preview">
             <div className="docs-preview-top">
-              <span className="lbl">// Report preview{selected && ` · ${reportId(selected)}`}</span>
+              <span className="lbl">Report preview{selected && ` · ${reportId(selected)}`}</span>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button className="btn ghost" disabled={!selected || building} onClick={() => selected && renderPreview(selected)}>
                   Refresh
@@ -161,7 +161,7 @@ export default function Docs({ onNavigate, onOpenScene, query = '' }: Props) {
       )}
 
       <div className="docs-guide">
-        <div className="lbl hi">// How to read a report</div>
+        <div className="lbl hi">How to read a report</div>
         <div className="docs-guide-grid">
           <div>
             <h4>01 · Imagery</h4>

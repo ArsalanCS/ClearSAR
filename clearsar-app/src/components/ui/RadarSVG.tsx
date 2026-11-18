@@ -74,7 +74,7 @@ export default function RadarSVG() {
       </circle>
 
       {/* Bearing labels */}
-      <g fontFamily="JetBrains Mono" fontSize="9" fill="#64748b" letterSpacing="1">
+      <g fontFamily="Inter" fontSize="9" fill="#64748b" letterSpacing="1">
         <text x="250" y="8" textAnchor="middle">N 00°</text>
         <text x="497" y="253" textAnchor="end">E 090°</text>
         <text x="250" y="499" textAnchor="middle">S 180°</text>

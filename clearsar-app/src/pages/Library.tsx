@@ -47,7 +47,7 @@ export default function Library({ onNavigate, onOpenScene, query = '' }: Props) 
       </div>
 
       {error && (
-        <div style={{ border: '1px solid var(--danger)', color: 'var(--danger)', padding: '10px 14px', marginBottom: 16, fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>
+        <div style={{ border: '1px solid var(--danger)', color: 'var(--danger)', padding: '10px 14px', marginBottom: 16, fontFamily: "'Inter', system-ui, sans-serif", fontSize: 12 }}>
           ⚠ {error} — is the backend reachable?
         </div>
       )}
@@ -62,7 +62,7 @@ export default function Library({ onNavigate, onOpenScene, query = '' }: Props) 
             <rect x="3" y="4" width="18" height="16" rx="1"/>
             <line x1="12" y1="4" x2="12" y2="20"/>
           </svg>
-          <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: 'var(--ink-3)' }}>
+          <div style={{ fontFamily: "'Inter', system-ui, sans-serif", fontSize: 11, letterSpacing: '.02em', textTransform: 'uppercase', color: 'var(--ink-3)' }}>
             NO SCENES PROCESSED
           </div>
           <button className="btn primary" onClick={() => onNavigate('upload')}>Upload first scene →</button>
@@ -70,7 +70,7 @@ export default function Library({ onNavigate, onOpenScene, query = '' }: Props) 
       ) : (
         <div className="dash-grid">
           {scenes !== null && shown.length === 0 && (
-            <div style={{ color: 'var(--ink-3)', fontFamily: "'JetBrains Mono', monospace", fontSize: 11 }}>No scenes match “{query}”.</div>
+            <div style={{ color: 'var(--ink-3)', fontFamily: "'Inter', system-ui, sans-serif", fontSize: 11 }}>No scenes match “{query}”.</div>
           )}
           {shown.map(scene => (
             <div key={scene.job_id} className="card" onClick={() => openScene(scene.job_id)}>

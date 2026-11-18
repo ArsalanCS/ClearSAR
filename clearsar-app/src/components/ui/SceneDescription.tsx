@@ -76,7 +76,7 @@ export default function SceneDescription({ jobId, filename }: Props) {
     <div className="desc-panel">
       <div className="desc-head">
         <div>
-          <div className="lbl hi">// Scene description · SAR → optical</div>
+          <div className="lbl hi">Scene description · SAR → optical</div>
           {desc?.status === 'completed' && (
             <div className="desc-meta">
               {desc.engine === 'vlm' ? `written by ${describerName(desc.vlm)}` : 'measured SAR statistics only'}

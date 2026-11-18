@@ -7,7 +7,7 @@ interface Props {
 
 const NAV_ITEMS = [
   {
-    section: '// Workspace',
+    section: 'Workspace',
     items: [
       { id: 'landing' as PageId, label: 'Overview', icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>) },
       { id: 'upload' as PageId, label: 'New translation', icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M12 4v12m0 0l-4-4m4 4l4-4M5 20h14"/></svg>) },
@@ -17,7 +17,7 @@ const NAV_ITEMS = [
     ],
   },
   {
-    section: '// Research',
+    section: 'Research',
     items: [
       { id: 'admin' as PageId, label: 'Evaluation', shortcut: 'E', icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M3 17l5-5 4 4 4-6 5 7"/><path d="M3 20h18"/></svg>) },
       { id: 'docs' as PageId, label: 'Docs & reports', shortcut: 'D', icon: (<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h5"/></svg>) },

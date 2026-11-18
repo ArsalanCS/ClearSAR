@@ -67,7 +67,7 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
       {error && (
         <div style={{
           border: '1px solid var(--danger)', color: 'var(--danger)',
-          padding: '10px 14px', marginBottom: 16, fontFamily: "'JetBrains Mono', monospace",
+          padding: '10px 14px', marginBottom: 16, fontFamily: "'Inter', system-ui, sans-serif",
           fontSize: 12, letterSpacing: '.1em',
         }}>
           ⚠ {error} — is the backend reachable?
@@ -76,7 +76,7 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
 
       {/* Scene conditioning — the translation model's season/terrain text prompt */}
       <div className="cond-bar">
-        <span className="cond-label">// Scene conditioning</span>
+        <span className="cond-label">Scene conditioning</span>
         <label className="cond-field">
           Season
           <select className="cond-select" value={season} onChange={e => setSeason(e.target.value as Season)}>
@@ -168,7 +168,7 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
             className="panel-card"
             style={{ background: 'linear-gradient(135deg, rgba(29,78,216,.08), var(--panel))', borderColor: 'var(--line-2)' }}
           >
-            <h4 style={{ color: 'var(--accent)' }}>// Processing time · Colab T4</h4>
+            <h4 style={{ color: 'var(--accent)' }}>Processing time · Colab T4</h4>
             <div className="help-row">
               <span>Preprocess</span>
               <span className="mono">~1 s</span>

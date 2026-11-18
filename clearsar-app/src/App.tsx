@@ -22,7 +22,7 @@ const KEY_MAP: Record<string, PageId> = {
 }
 
 export default function App() {
-  const [page, setPage] = useState<PageId>('landing')
+  const [page, setPage] = useState<PageId>(() => (window.location.hash.slice(1) as PageId) || 'landing')
   const [toast, setToast] = useState(false)
   const [jobId, setJobId] = useState<string | null>(null)
   const [query, setQuery] = useState('')

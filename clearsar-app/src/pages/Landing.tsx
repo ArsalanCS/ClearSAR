@@ -99,22 +99,22 @@ export default function Landing({ onNavigate }: Props) {
           </div>
           <div className="cap-cards">
             <div className="cap">
-              <div className="lbl hi">// Translate</div>
+              <div className="lbl hi">Translate</div>
               <h3>SAR → Optical</h3>
               <p>A one-step regressor, distilled from a Schrödinger bridge on an adapted 16-channel SD-1.5 latent, turns radar backscatter into an optical estimate in a single deterministic pass.</p>
             </div>
             <div className="cap">
-              <div className="lbl hi">// Describe</div>
+              <div className="lbl hi">Describe</div>
               <h3>Scene summaries</h3>
               <p>Qwen2.5-VL reads the SAR, the translation and measured radar statistics, then writes a short summary with a confidence tag on every claim.</p>
             </div>
             <div className="cap">
-              <div className="lbl hi">// Measure</div>
+              <div className="lbl hi">Measure</div>
               <h3>Quantified quality</h3>
               <p>PSNR, SSIM, LPIPS, FID, SAM and CC on a held-out test set, broken down by season and terrain and compared with the bridge and earlier approaches.</p>
             </div>
             <div className="cap">
-              <div className="lbl hi">// Deploy</div>
+              <div className="lbl hi">Deploy</div>
               <h3>Reports</h3>
               <p>React + FastAPI on a GPU backend. Drag and drop a scene, then download a PDF report with both images and the description — or integrate via REST.</p>
             </div>
@@ -249,7 +249,7 @@ export default function Landing({ onNavigate }: Props) {
             </div>
           </div>
           <div className="team-card">
-            <div className="lbl hi">// FYP TEAM · 2026</div>
+            <div className="lbl hi">FYP TEAM · 2026</div>
             <div className="tm">
               <div className="tm-av">AH</div>
               <div><b>Arsalan Hassan</b><small>22F-3050 · ML &amp; Backend</small></div>

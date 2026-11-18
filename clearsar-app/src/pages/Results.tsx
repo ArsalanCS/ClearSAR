@@ -72,7 +72,7 @@ export default function Results({ onNavigate, jobId }: Props) {
       </div>
 
       {error && (
-        <div style={{ border: '1px solid var(--danger)', color: 'var(--danger)', padding: '10px 14px', marginBottom: 16, fontFamily: "'JetBrains Mono', monospace", fontSize: 12 }}>
+        <div style={{ border: '1px solid var(--danger)', color: 'var(--danger)', padding: '10px 14px', marginBottom: 16, fontFamily: "'Inter', system-ui, sans-serif", fontSize: 12 }}>
           ⚠ {error}
         </div>
       )}
@@ -90,7 +90,7 @@ export default function Results({ onNavigate, jobId }: Props) {
           </div>
           <div className="viewer-stage">
             {!result ? (
-              <div style={{ color: 'var(--ink-3)', fontFamily: "'JetBrains Mono', monospace", fontSize: 12, letterSpacing: '.2em' }}>
+              <div style={{ color: 'var(--ink-3)', fontFamily: "'Inter', system-ui, sans-serif", fontSize: 12, letterSpacing: '.02em' }}>
                 LOADING SCENE…
               </div>
             ) : activeTab === 1 ? (
@@ -109,7 +109,7 @@ export default function Results({ onNavigate, jobId }: Props) {
 
         <div className="side-panel">
           <div className="caption-block" style={{ padding: 14 }}>
-            <div className="lbl" style={{ marginBottom: 10 }}>// Model eval metrics · SEN12MS 256px</div>
+            <div className="lbl" style={{ marginBottom: 10 }}>Model eval metrics · SEN12MS 256px</div>
             <div className="met-grid">
               <div className="mc">
                 <div className="lbl">PSNR ↑</div>
@@ -133,7 +133,7 @@ export default function Results({ onNavigate, jobId }: Props) {
           </div>
 
           <div className="caption-block">
-            <div className="lbl" style={{ marginBottom: 10 }}>// Export</div>
+            <div className="lbl" style={{ marginBottom: 10 }}>Export</div>
             <div className="act-col">
               <button className="btn" onClick={report} disabled={!result || reporting}>
                 <span>{reporting ? 'Building report…' : 'Download PDF report'}</span>
