@@ -1194,3 +1194,12 @@ tbody tr:hover td { background: #f8fbfe; }
 .sidebar .on, .sidebar .active { background: var(--cyan-soft) !important; }
 h1, h2, h3, .ph h1 { background: none !important; -webkit-text-fill-color: currentColor !important; }
 .ph .btn.primary { background: var(--cyan) !important; border-color: var(--cyan) !important; } .ph .btn.primary:hover { background: #0a9cbc !important; }
+/* Logo alignment */
+.brand { display: flex; align-items: center; height: 60px; padding: 0 12px; margin: -22px -16px 18px; border-bottom: 1px solid var(--line); }
+.brand-logo { height: 36px; width: auto; max-width: none; }
+.lnav { display: flex; align-items: center; }
+.lnav-brand { display: flex; align-items: center; }
+.lnav-logo { height: 40px; width: auto; }
+.sidebar { padding-top: 0 !important; }
+.brand { margin: 0 -16px 18px !important; padding: 0 20px !important; height: 60px; box-sizing: border-box; }
+.brand, .sidebar nav { flex-shrink: 0; }
