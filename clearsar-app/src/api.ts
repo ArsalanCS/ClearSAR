@@ -57,6 +57,10 @@ export function modelSummary(r: Pick<JobResult, 'model' | 'ddim_steps'>): string
   return how ? `${m.name} · ${how}` : m.name
 }
 
+// Scene descriptions are written by Qwen2.5-VL; `vlm` carries the exact checkpoint id.
+export const DESCRIBER = 'Qwen2.5-VL'
+export const describerName = (vlm?: string | null) => (vlm ? vlm.split('/').pop()! : DESCRIBER)
+
 export type DescriptionStatus = 'off' | 'pending' | 'running' | 'completed' | 'failed'
 export type Confidence = 'high' | 'medium' | 'low'
 

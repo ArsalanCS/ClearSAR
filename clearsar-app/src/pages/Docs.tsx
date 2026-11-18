@@ -169,14 +169,14 @@ export default function Docs({ onNavigate, onOpenScene, query = '' }: Props) {
           </div>
           <div>
             <h4>02 · Scene description</h4>
-            <p>A short summary of the scene. Each claim carries a tag:
+            <p>A short summary of the scene, written by the Qwen2.5-VL vision-language model. Each claim carries a tag:
               <span className="conf-tag high">high</span> SAR facts and both images agree,
               <span className="conf-tag medium">medium</span> plausible,
               <span className="conf-tag low">low</span> best guess. The Reliability line names the least trustworthy part.</p>
           </div>
           <div>
             <h4>03 · Measured SAR facts</h4>
-            <p>Statistics computed from the radar pixels: region brightness and texture, dark smooth areas (possible water), bright areas, and dominant line direction. These anchor the description to this scene.</p>
+            <p>Statistics computed from the radar pixels: region brightness and texture, dark smooth areas (possible water), bright areas, and dominant line direction. They are given to Qwen2.5-VL to anchor the description to this scene.</p>
           </div>
           <div>
             <h4>04 · Model and evaluation</h4>

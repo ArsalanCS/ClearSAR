@@ -91,15 +91,15 @@ export default function Processing({ onNavigate, onComplete, jobId }: Props) {
       <div className="processing-wrap">
         <div className="proc-ring">
           <svg viewBox="0 0 320 320">
-            <circle cx="160" cy="160" r="140" fill="none" stroke="#1e232d" strokeWidth="3"/>
+            <circle cx="160" cy="160" r="140" fill="none" stroke="#e2e8f0" strokeWidth="3"/>
             <circle
               cx="160" cy="160" r="140"
-              fill="none" stroke={error ? '#ff4d5a' : '#ff6a2c'} strokeWidth="3"
+              fill="none" stroke={error ? '#dc2626' : '#1d4ed8'} strokeWidth="3"
               strokeLinecap="round"
               strokeDasharray={dashArray}
-              style={{ filter: `drop-shadow(0 0 8px ${error ? '#ff4d5a' : '#ff6a2c'})`, transition: 'stroke-dasharray .4s' }}
+              style={{ transition: 'stroke-dasharray .4s' }}
             />
-            <circle cx="160" cy="160" r="110" fill="none" stroke="#2a313d" strokeWidth="1" strokeDasharray="2 6"/>
+            <circle cx="160" cy="160" r="110" fill="none" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="2 6"/>
           </svg>
           <div className="proc-center">
             <div className="st">{error ? 'ERROR' : currentStage.toUpperCase()}</div>

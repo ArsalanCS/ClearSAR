@@ -12,11 +12,11 @@ export default function Landing({ onNavigate }: Props) {
       <header className="lnav">
         <div className="lnav-brand">
           <svg viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="#ff6a2c" strokeWidth="1.2"/>
-            <circle cx="12" cy="12" r="5" stroke="#ff6a2c" strokeWidth="1.2"/>
-            <circle cx="12" cy="12" r="1.5" fill="#ff6a2c"/>
-            <line x1="2" y1="12" x2="22" y2="12" stroke="#ff6a2c" strokeWidth=".6" strokeDasharray="1 2"/>
-            <line x1="12" y1="2" x2="12" y2="22" stroke="#ff6a2c" strokeWidth=".6" strokeDasharray="1 2"/>
+            <circle cx="12" cy="12" r="10" stroke="#1d4ed8" strokeWidth="1.2"/>
+            <circle cx="12" cy="12" r="5" stroke="#1d4ed8" strokeWidth="1.2"/>
+            <circle cx="12" cy="12" r="1.5" fill="#1d4ed8"/>
+            <line x1="2" y1="12" x2="22" y2="12" stroke="#1d4ed8" strokeWidth=".6" strokeDasharray="1 2"/>
+            <line x1="12" y1="2" x2="12" y2="22" stroke="#1d4ed8" strokeWidth=".6" strokeDasharray="1 2"/>
           </svg>
           <b>ClearSAR</b>
         </div>

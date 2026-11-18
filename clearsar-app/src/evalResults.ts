@@ -10,7 +10,7 @@
 export const MODEL_REPO = 'AliMusaRizvi/sar-to-optical-diffusion'
 export const MODEL_NAME = 'regressor_v3_final'
 export const MODEL_LABEL = 'Regressor v3'
-export const MODEL_SUMMARY = 'Deterministic one-step regressor on the adapted 16-ch SD-1.5 latent, distilled from the Schrödinger bridge, with a fine-tuned decoder and CLIP season/terrain conditioning'
+export const MODEL_SUMMARY = 'Deterministic one-step regressor on the adapted 16-ch SD-1.5 latent, distilled from the Schrödinger bridge, with a fine-tuned decoder and season/terrain text conditioning'
 export const RESULTS_URL = `https://huggingface.co/${MODEL_REPO}/blob/main/final_eval_results/full_eval_results.json`
 export const MODEL_URL = `https://huggingface.co/${MODEL_REPO}/tree/main/${MODEL_NAME}`
 export const TRAIN_STEPS = 80_000

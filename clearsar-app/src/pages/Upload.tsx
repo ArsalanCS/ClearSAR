@@ -74,7 +74,7 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
         </div>
       )}
 
-      {/* Scene conditioning — drives the model's CLIP text prompt */}
+      {/* Scene conditioning — the translation model's season/terrain text prompt */}
       <div className="cond-bar">
         <span className="cond-label">// Scene conditioning</span>
         <label className="cond-field">
@@ -115,7 +115,7 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
             viewBox="0 0 500 500"
             preserveAspectRatio="xMidYMid slice"
           >
-            <g fill="none" stroke="#2a313d" strokeWidth="1">
+            <g fill="none" stroke="#cbd5e1" strokeWidth="1">
               <circle cx="250" cy="250" r="220" strokeDasharray="3 6"/>
               <circle cx="250" cy="250" r="160" strokeDasharray="3 6"/>
               <circle cx="250" cy="250" r="100"/>
@@ -166,7 +166,7 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
 
           <div
             className="panel-card"
-            style={{ background: 'linear-gradient(135deg, rgba(255,106,44,.08), var(--panel))', borderColor: 'var(--line-2)' }}
+            style={{ background: 'linear-gradient(135deg, rgba(29,78,216,.08), var(--panel))', borderColor: 'var(--line-2)' }}
           >
             <h4 style={{ color: 'var(--accent)' }}>// Processing time · Colab T4</h4>
             <div className="help-row">
@@ -178,7 +178,7 @@ export default function Upload({ onNavigate, onJobCreated }: Props) {
               <span className="mono">&lt;1 s</span>
             </div>
             <div className="help-row">
-              <span>VLM scene summary</span>
+              <span>Qwen2.5-VL summary</span>
               <span className="mono">~8 s</span>
             </div>
             <div className="help-row" style={{ color: 'var(--accent)' }}>

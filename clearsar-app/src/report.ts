@@ -3,6 +3,7 @@
 import type { jsPDF } from 'jspdf'
 import {
   apiUrl, getDescription, getResult, JobResult, SceneDescription, PURPOSE_LABELS, Confidence, modelSummary,
+  DESCRIBER, describerName,
 } from './api'
 
 export interface ReportData {
@@ -163,7 +164,9 @@ function header(w: Writer, data: ReportData) {
   doc.text(title, M, w.y)
   w.y += 5.5
   w.font(9, 'normal', C.mute)
-  doc.text('Synthetic-aperture radar scene translated to an optical estimate and described automatically.', M, w.y)
+  const by = data.desc?.status === 'completed' && data.desc.engine === 'vlm' ? `described by ${describerName(data.desc.vlm)}`
+    : 'described automatically'
+  doc.text(`Synthetic-aperture radar scene translated to an optical estimate and ${by}.`, M, w.y)
   w.y += 6
 }
 
@@ -171,7 +174,7 @@ function details(w: Writer, data: ReportData) {
   const { doc } = w
   const { result, desc } = data
   const engine = !desc || desc.status === 'off' ? 'Not generated'
-    : desc.engine === 'vlm' ? (desc.vlm ?? 'Vision-language model')
+    : desc.engine === 'vlm' ? describerName(desc.vlm)
     : desc.engine === 'facts' ? 'Measured SAR statistics (no VLM)' : cap(desc.status)
   const rows: [string, string, string, string][] = [
     ['Scene ID', result.job_id, 'Processed', fmtDate(result.created_at)],
@@ -266,7 +269,7 @@ function description(w: Writer, data: ReportData) {
     w.y += h + 4
   }
   if (desc.engine === 'facts' && desc.fallback_reason) {
-    w.para('The vision-language model was unavailable, so this description was written from measured SAR statistics only.', 8, C.mute)
+    w.para(`${DESCRIBER} was unavailable, so this description was written from measured SAR statistics only.`, 8, C.mute)
   }
   if (desc.truncated) w.para('The model reached its length limit; the last sentence may be incomplete.', 8, C.mute)
 }
@@ -294,10 +297,10 @@ function facts(w: Writer, data: ReportData) {
 
 const METHOD_TEXT: Record<string, (steps: number | null) => string> = {
   regressor: () => 'a deterministic one-step regressor on an adapted 16-channel Stable Diffusion 1.5 latent, ' +
-    'distilled from the Schrödinger bridge, with a fine-tuned decoder and CLIP season/terrain conditioning. ' +
+    'distilled from the Schrödinger bridge, with a fine-tuned decoder and season/terrain text conditioning. ' +
     'It predicts the optical image in a single UNet pass, so the same scene always gives the same result',
   bridge: steps => `an Image-to-Image Schrödinger Bridge on an adapted 16-channel Stable Diffusion 1.5 latent ` +
-    `with CLIP season/terrain conditioning, sampled in ${steps ?? 15} steps`,
+    `with season/terrain text conditioning, sampled in ${steps ?? 15} steps`,
   mock: () => 'a placeholder generator used for interface testing (no trained model)',
 }
 
@@ -308,8 +311,9 @@ function model(w: Writer, data: ReportData) {
   w.heading(data.desc?.sar_facts ? '04' : '03', 'Model and evaluation')
   const how = info?.method && METHOD_TEXT[info.method] ? METHOD_TEXT[info.method](info.steps) : 'a latent SAR-to-optical model'
   w.para(`Translation: ${info?.name ?? 'SAR-to-optical model'}, ${how}. ` +
-    'Description: a vision-language model reads the despeckled SAR, the translated image and the measured SAR facts, ' +
-    'and tags each claim high, medium or low confidence.', 9, C.ink2)
+    `Description: ${data.desc?.engine === 'vlm' ? describerName(data.desc.vlm) : DESCRIBER}, a Qwen vision-language model, ` +
+    'reads the despeckled SAR, the translated image and the measured SAR facts, and tags each claim high, medium or ' +
+    'low confidence.', 9, C.ink2)
   w.y += 2
   const m = result.metrics
   const f = (v: number | null | undefined, d: number, unit = '') => (v == null ? '—' : `${v.toFixed(d)}${unit}`)

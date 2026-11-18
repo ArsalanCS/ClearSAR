@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
   getDescription, regenerateDescription, SceneDescription as Desc, Purpose, PURPOSES, PURPOSE_LABELS,
+  DESCRIBER, describerName,
 } from '../../api'
 
 interface Props {
@@ -78,7 +79,7 @@ export default function SceneDescription({ jobId, filename }: Props) {
           <div className="lbl hi">// Scene description · SAR → optical</div>
           {desc?.status === 'completed' && (
             <div className="desc-meta">
-              {desc.engine === 'vlm' ? (desc.vlm ?? 'VLM') : 'measured SAR statistics only'}
+              {desc.engine === 'vlm' ? `written by ${describerName(desc.vlm)}` : 'measured SAR statistics only'}
               {desc.elapsed_s != null && ` · ${desc.elapsed_s}s`}
               {desc.retried && ' · retried'}
             </div>
@@ -103,7 +104,7 @@ export default function SceneDescription({ jobId, filename }: Props) {
         <div className="desc-loading">
           <span className="desc-pulse" />
           {desc?.status === 'running'
-            ? 'Reading the SAR + translated optical and writing the description…'
+            ? `${DESCRIBER} is reading the SAR + translated optical and writing the description…`
             : 'Queued — the description starts once the optical image is ready…'}
         </div>
       )}
@@ -116,7 +117,7 @@ export default function SceneDescription({ jobId, filename }: Props) {
         <>
           {desc.engine === 'facts' && desc.fallback_reason && (
             <div className="desc-note">
-              The vision-language model was unavailable, so this description uses measured SAR statistics only.
+              {DESCRIBER} was unavailable, so this description uses measured SAR statistics only.
             </div>
           )}
 
